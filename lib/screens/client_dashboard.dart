@@ -197,7 +197,8 @@ class DashboardCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
+        constraints: const BoxConstraints(minHeight: 88),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
@@ -217,22 +218,35 @@ class DashboardCard extends StatelessWidget {
           children: [
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Tap to open',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
             ),
-            SvgPicture.asset(asset, width: 72, height: 72),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final iconSize = constraints.maxWidth < 120 ? 48.0 : 72.0;
+                return SvgPicture.asset(
+                  asset,
+                  width: iconSize,
+                  height: iconSize,
+                );
+              },
+            ),
           ],
         ),
       ),
