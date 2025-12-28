@@ -213,6 +213,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @enterLegalQuery.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your legal query...'**
+  String get enterLegalQuery;
+
+  /// No description provided for @noAccountSignup.
+  ///
+  /// In en, this message translates to:
+  /// **'No account? Sign Up'**
+  String get noAccountSignup;
+
+  /// No description provided for @alreadyHaveAccountLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Login'**
+  String get alreadyHaveAccountLogin;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @clientWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, User! How can we help you today?'**
+  String get clientWelcome;
+
+  /// No description provided for @recentConsultations.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Consultations'**
+  String get recentConsultations;
+
+  /// No description provided for @consultationArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived consultation'**
+  String get consultationArchived;
+
+  /// No description provided for @consultation.
+  ///
+  /// In en, this message translates to:
+  /// **'Consultation'**
+  String get consultation;
 }
 
 class _AppLocalizationsDelegate

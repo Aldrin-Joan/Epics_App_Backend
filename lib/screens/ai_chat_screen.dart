@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_application_1/l10n/app_localizations.dart';
+import 'package:flutter_application_1/providers/chat_controller.dart';
+import 'package:flutter_application_1/widgets/chat_bubble.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
   const AIChatScreen({super.key});
@@ -11,102 +13,71 @@ class AIChatScreen extends ConsumerStatefulWidget {
 
 class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<Map<String, String>> _messages = [
-    {
-      "role": "ai",
-      "content":
-          "Hello! I am your Legal AI assistant. How can I help you with your case details today?",
-    },
-  ];
 
-  void _sendMessage() {
-    if (_controller.text.isEmpty) return;
-    setState(() {
-      _messages.add({"role": "user", "content": _controller.text});
-      _messages.add({
-        "role": "ai",
-        "content": "Thinking... (Placeholder response)",
-      });
-    });
+  void _send() {
+    ref.read(chatProvider.notifier).sendMessage(_controller.text);
     _controller.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final messages = ref.watch(chatProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.aiChat)),
+      appBar: AppBar(title: Text(l10n.aiChat), centerTitle: true),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: _messages.length,
+              padding: const EdgeInsets.all(16),
+              itemCount: messages.length,
               itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isAI = msg["role"] == "ai";
-                return Align(
-                  alignment: isAI
-                      ? Alignment.centerLeft
-                      : Alignment.centerRight,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: isAI
-                          ? Colors.blue.shade100
-                          : Colors.deepPurple.shade100,
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.75,
-                    ),
-                    child: Text(msg["content"]!),
-                  ),
-                );
+                return ChatBubble(message: messages[index]);
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.mic, color: Colors.deepPurple),
-                  onPressed: () {
-                    // Placeholder for Speech-to-Text
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Listening... (Speech-to-Text Placeholder)",
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.mic, color: colorScheme.primary),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Listening… (Speech-to-Text placeholder)',
+                          ),
+                        ),
+                      );
+                    },
+                    tooltip: 'Voice input',
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _send(),
+                      decoration: InputDecoration(
+                        hintText: l10n.enterLegalQuery,
+                        filled: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                    );
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "Enter your legal query...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(24)),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
                     ),
-                    onSubmitted: (_) => _sendMessage(),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.deepPurple),
-                  onPressed: _sendMessage,
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    icon: const Icon(Icons.send),
+                    label: const Text('Send'),
+                    onPressed: _send,
+                  ),
+                ],
+              ),
             ),
           ),
         ],

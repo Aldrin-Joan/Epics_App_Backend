@@ -16,5 +16,14 @@
   "inbox": "Inbox",
   "profile": "Profile",
   "settings": "Settings",
-  "language": "Language"
+  "language": "Language",
+
+  "enterLegalQuery": "Enter your legal query...",
+  "noAccountSignup": "No account? Sign Up",
+  "alreadyHaveAccountLogin": "Already have an account? Login",
+  "logout": "Logout",
+  "clientWelcome": "Hello, User! How can we help you today?",
+  "recentConsultations": "Recent Consultations",
+  "consultationArchived": "Archived consultation",
+  "consultation": "Consultation"
 }

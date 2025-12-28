@@ -61,4 +61,28 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get language => 'भाषा';
+
+  @override
+  String get enterLegalQuery => 'Enter your legal query...';
+
+  @override
+  String get noAccountSignup => 'No account? Sign Up';
+
+  @override
+  String get alreadyHaveAccountLogin => 'Already have an account? Login';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get clientWelcome => 'Hello, User! How can we help you today?';
+
+  @override
+  String get recentConsultations => 'Recent Consultations';
+
+  @override
+  String get consultationArchived => 'Archived consultation';
+
+  @override
+  String get consultation => 'Consultation';
 }
