@@ -1,0 +1,20 @@
+{
+  "appTitle": "Legal Super App",
+  "welcomeMessage": "Welcome to your Legal Assistant",
+  "login": "Login",
+  "signup": "Sign Up",
+  "email": "Email",
+  "password": "Password",
+  "fullName": "Full Name",
+  "selectRole": "Select Your Role",
+  "client": "Client",
+  "lawyer": "Lawyer",
+  "aiChat": "Legal AI Chat",
+  "uploadDocs": "Upload Documents",
+  "findLawyers": "Find Lawyers",
+  "feed": "Social Feed",
+  "inbox": "Inbox",
+  "profile": "Profile",
+  "settings": "Settings",
+  "language": "Language"
+}
