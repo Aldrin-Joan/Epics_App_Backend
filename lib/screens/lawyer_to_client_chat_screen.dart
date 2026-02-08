@@ -1,42 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_1/l10n/app_localizations.dart';
-import 'package:flutter_application_1/providers/chat_controller.dart';
 import 'package:flutter_application_1/widgets/chat_bubble.dart';
 import 'package:flutter_application_1/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_application_1/models/chat_message.dart';
 
-class AIChatScreen extends ConsumerStatefulWidget {
-  const AIChatScreen({super.key});
-
+// Provider for Lawyer-to-Client chat
+class LawyerToClientChatNotifier extends Notifier<List<ChatMessage>> {
   @override
-  ConsumerState<AIChatScreen> createState() => _AIChatScreenState();
+  List<ChatMessage> build() {
+    return [
+      const ChatMessage(
+        content: "Hello, could you review these documents?",
+        role: ChatRole.user, // Client talking
+      ),
+    ];
+  }
+
+  void addMessage(ChatMessage message) {
+    state = [...state, message];
+  }
 }
 
-class _AIChatScreenState extends ConsumerState<AIChatScreen> {
+final lawyerToClientChatProvider =
+    NotifierProvider<LawyerToClientChatNotifier, List<ChatMessage>>(
+      LawyerToClientChatNotifier.new,
+    );
+
+class LawyerToClientChatScreen extends ConsumerStatefulWidget {
+  const LawyerToClientChatScreen({super.key});
+
+  @override
+  ConsumerState<LawyerToClientChatScreen> createState() =>
+      _LawyerToClientChatScreenState();
+}
+
+class _LawyerToClientChatScreenState
+    extends ConsumerState<LawyerToClientChatScreen> {
   final TextEditingController _controller = TextEditingController();
 
   void _send() {
     if (_controller.text.trim().isEmpty) return;
-    ref.read(chatProvider.notifier).sendMessage(_controller.text);
+
+    final messageText = _controller.text;
     _controller.clear();
+
+    // I am the Lawyer sending a message
+    ref
+        .read(lawyerToClientChatProvider.notifier)
+        .addMessage(ChatMessage(content: messageText, role: ChatRole.lawyer));
+
+    // Simulate Client response
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      ref
+          .read(lawyerToClientChatProvider.notifier)
+          .addMessage(
+            const ChatMessage(
+              content: "Sure, let me check that for you.",
+              role: ChatRole.user,
+            ),
+          );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final messages = ref.watch(chatProvider);
+    final messages = ref.watch(lawyerToClientChatProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: Text(
-          l10n.aiChat,
-          style: GoogleFonts.sora(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimaryLight,
-          ),
+        title: Column(
+          children: [
+            Text(
+              "Client Name 1", // Dynamic in real app
+              style: GoogleFonts.sora(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimaryLight,
+              ),
+            ),
+            Text(
+              "online",
+              style: GoogleFonts.sora(
+                fontSize: 12,
+                color: AppColors.accent,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -59,6 +112,16 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.call_rounded, color: AppColors.primary),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.videocam_rounded, color: AppColors.primary),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -67,7 +130,10 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               padding: const EdgeInsets.all(20),
               itemCount: messages.length,
               itemBuilder: (context, index) {
-                return ChatBubble(message: messages[index]);
+                final msg = messages[index];
+                // If I am Lawyer, 'lawyer' role is ME.
+                final isMe = msg.role == ChatRole.lawyer;
+                return ChatBubble(message: msg, isMeOverride: isMe);
               },
             ),
           ),
@@ -81,39 +147,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             ),
             child: Row(
               children: [
-                // Voice Button
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Voice input not implemented'),
-                        ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceLight,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFE2E8F0),
-                          width: 2,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.mic_none_rounded,
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Text Input
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -128,7 +161,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                       controller: _controller,
                       style: GoogleFonts.sora(fontSize: 15),
                       decoration: InputDecoration(
-                        hintText: "Ask a legal question...",
+                        hintText: "Type a message...",
                         hintStyle: GoogleFonts.sora(
                           color: AppColors.textSecondaryLight,
                           fontSize: 14,
@@ -147,8 +180,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-
-                // Send Button
                 Material(
                   color: Colors.transparent,
                   child: InkWell(

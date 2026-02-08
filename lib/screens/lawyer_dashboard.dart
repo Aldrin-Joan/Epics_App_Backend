@@ -4,6 +4,8 @@ import 'package:flutter_application_1/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_application_1/models/feed_post.dart';
 import 'package:flutter_application_1/providers/feed_controller.dart';
+import 'package:flutter_application_1/theme/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LawyerDashboard extends ConsumerWidget {
   const LawyerDashboard({super.key});
@@ -76,55 +78,113 @@ class FeedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(feedProvider.notifier);
 
-    return Card(
-      margin: const EdgeInsets.all(12),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            leading: const CircleAvatar(child: Icon(Icons.person)),
-            title: Text(post.author),
-            subtitle: Text(post.title),
-            trailing: TextButton(
-              onPressed: () {
-                controller.toggleFollow(post.id);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(post.following ? 'Unfollowed' : 'Following'),
-                  ),
-                );
-              },
-              child: Text(post.following ? 'Following' : 'Follow'),
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.backgroundLight,
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.author,
+                      style: GoogleFonts.sora(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimaryLight,
+                      ),
+                    ),
+                    Text(
+                      post.title, // Treating title as role/subtitle for now
+                      style: GoogleFonts.sora(
+                        fontSize: 12,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.toggleFollow(post.id);
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: post.following
+                      ? AppColors.textSecondaryLight
+                      : AppColors.primary,
+                  textStyle: GoogleFonts.sora(fontWeight: FontWeight.w600),
+                ),
+                child: Text(post.following ? 'Following' : 'Follow'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            post.content,
+            style: GoogleFonts.sora(
+              fontSize: 14,
+              height: 1.5,
+              color: AppColors.textPrimaryLight,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(post.content),
-          ),
-          const SizedBox(height: 8),
-          OverflowBar(
-            spacing: 8,
-            overflowSpacing: 8,
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: Icon(
-                  post.liked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                ),
-                onPressed: () => controller.toggleLike(post.id),
+              _ActionButton(
+                icon: post.liked
+                    ? Icons.thumb_up_rounded
+                    : Icons.thumb_up_outlined,
+                label: '${post.likes}',
+                isActive: post.liked,
+                onTap: () => controller.toggleLike(post.id),
               ),
-              Text('${post.likes}'),
-              IconButton(
-                icon: const Icon(Icons.comment_outlined),
-                onPressed: () {
+              _ActionButton(
+                icon: Icons.comment_outlined,
+                label: 'Comment',
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (_) => const CommentDialog(),
                   );
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.share_outlined),
-                onPressed: () {
+              _ActionButton(
+                icon: Icons.share_outlined,
+                label: 'Share',
+                onTap: () {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(const SnackBar(content: Text('Link copied')));
@@ -138,19 +198,181 @@ class FeedCard extends ConsumerWidget {
   }
 }
 
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    this.isActive = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isActive
+                  ? AppColors.primary
+                  : AppColors.textSecondaryLight,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.sora(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isActive
+                    ? AppColors.primary
+                    : AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class InboxView extends StatelessWidget {
   const InboxView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
+      padding: const EdgeInsets.all(24),
       itemCount: 3,
-      itemBuilder: (_, i) => ListTile(
-        leading: const CircleAvatar(child: Icon(Icons.account_circle)),
-        title: Text('Client Name ${i + 1}'),
-        subtitle: const Text('Thank you for the advice.'),
-        trailing: const Text('10:30 AM'),
-        onTap: () => context.push('/ai-chat'),
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (_, i) => _InboxItem(index: i),
+    );
+  }
+}
+
+class _InboxItem extends StatelessWidget {
+  final int index;
+
+  const _InboxItem({required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasUnread = index == 0; // Demo logic
+
+    return InkWell(
+      onTap: () => context.push('/lawyer-to-client-chat'),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: hasUnread
+                ? AppColors.primary.withOpacity(0.3)
+                : const Color(0xFFE2E8F0),
+            width: hasUnread ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundLight,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.person_rounded,
+                    color: AppColors.textSecondaryLight,
+                    size: 28,
+                  ),
+                ),
+                if (hasUnread)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Client Name ${index + 1}',
+                        style: GoogleFonts.sora(
+                          fontSize: 15,
+                          fontWeight: hasUnread
+                              ? FontWeight.bold
+                              : FontWeight.w600,
+                          color: AppColors.textPrimaryLight,
+                        ),
+                      ),
+                      Text(
+                        '10:30 AM',
+                        style: GoogleFonts.sora(
+                          fontSize: 12,
+                          color: hasUnread
+                              ? AppColors.primary
+                              : AppColors.textSecondaryLight,
+                          fontWeight: hasUnread
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Thank you for the advice regarding the property dispute. I have a few more questions.',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.sora(
+                      fontSize: 13,
+                      color: hasUnread
+                          ? AppColors.textPrimaryLight
+                          : AppColors.textSecondaryLight,
+                      fontWeight: hasUnread ? FontWeight.w500 : FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
