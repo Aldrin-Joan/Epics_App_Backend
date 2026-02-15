@@ -50,3 +50,16 @@ __pycache__/
 data/
 test_rag.py
 *.pyc
+# Data
+data/raw_pdfs/
+data/processed/
+data/*.index
+data/*.json
+data/*.pkl
+
+# HuggingFace cache
+.cache/
+
+# Python
+venv/
+__pycache__/
