@@ -27,6 +27,8 @@ final lawyerToClientChatProvider =
       LawyerToClientChatNotifier.new,
     );
 
+// ONLY UI CHANGED — LOGIC SAME
+
 class LawyerToClientChatScreen extends ConsumerStatefulWidget {
   const LawyerToClientChatScreen({super.key});
 
@@ -45,17 +47,13 @@ class _LawyerToClientChatScreenState
     final messageText = _controller.text;
     _controller.clear();
 
-    // I am the Lawyer sending a message
     ref
         .read(lawyerToClientChatProvider.notifier)
         .addMessage(ChatMessage(content: messageText, role: ChatRole.lawyer));
 
-    // Simulate Client response
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      ref
-          .read(lawyerToClientChatProvider.notifier)
-          .addMessage(
+      ref.read(lawyerToClientChatProvider.notifier).addMessage(
             const ChatMessage(
               content: "Sure, let me check that for you.",
               role: ChatRole.user,
@@ -67,148 +65,146 @@ class _LawyerToClientChatScreenState
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(lawyerToClientChatProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
+      /// 🔥 MODERN APPBAR
       appBar: AppBar(
-        title: Column(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        centerTitle: false,
+        title: Row(
           children: [
-            Text(
-              "Client Name 1", // Dynamic in real app
-              style: GoogleFonts.sora(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimaryLight,
-              ),
+            const CircleAvatar(
+              radius: 18,
+              child: Icon(Icons.person, size: 18),
             ),
-            Text(
-              "online",
-              style: GoogleFonts.sora(
-                fontSize: 12,
-                color: AppColors.accent,
-                fontWeight: FontWeight.w500,
-              ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Client Name 1",
+                  style: GoogleFonts.sora(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  "Online",
+                  style: GoogleFonts.sora(
+                    fontSize: 11,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: AppColors.textPrimaryLight,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.call_rounded, color: AppColors.primary),
+            icon: const Icon(Icons.call_outlined),
           ),
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.videocam_rounded, color: AppColors.primary),
+            icon: const Icon(Icons.videocam_outlined),
           ),
         ],
       ),
+
       body: Column(
         children: [
+          /// 💬 CHAT LIST
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final msg = messages[index];
-                // If I am Lawyer, 'lawyer' role is ME.
                 final isMe = msg.role == ChatRole.lawyer;
-                return ChatBubble(message: msg, isMeOverride: isMe);
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: ChatBubble(
+                    message: msg,
+                    isMeOverride: isMe,
+                  ),
+                );
               },
             ),
           ),
+
+          /// ✨ MODERN INPUT BAR
           Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
             decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
-              border: const Border(
-                top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+              color: isDark
+                  ? const Color(0xFF0F172A)
+                  : Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey.withOpacity(0.15),
+                ),
               ),
             ),
             child: Row(
               children: [
+                /// TEXT FIELD (ROUNDED)
                 Expanded(
                   child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE2E8F0),
-                        width: 2,
-                      ),
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(28),
                     ),
-                    child: TextField(
-                      controller: _controller,
-                      style: GoogleFonts.sora(fontSize: 15),
-                      decoration: InputDecoration(
-                        hintText: "Type a message...",
-                        hintStyle: GoogleFonts.sora(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: 14,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.add, size: 20, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            style: GoogleFonts.sora(
+                              fontSize: 14,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: "Message...",
+                              hintStyle: GoogleFonts.sora(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            onSubmitted: (_) => _send(),
+                          ),
                         ),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        filled: false,
-                      ),
-                      onSubmitted: (_) => _send(),
+                        const Icon(Icons.mic_none, size: 20, color: Colors.grey),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _send,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryLight],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+
+                const SizedBox(width: 10),
+
+                /// SEND BUTTON (FLOATING STYLE)
+                GestureDetector(
+                  onTap: _send,
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.primary, AppColors.primaryLight],
                       ),
-                      child: const Icon(
-                        Icons.send_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(Icons.send, color: Colors.white, size: 20),
                   ),
                 ),
               ],

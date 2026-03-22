@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_1/l10n/app_localizations.dart';
 import 'package:flutter_application_1/providers/chat_controller.dart';
-import 'package:flutter_application_1/widgets/chat_bubble.dart';
-import 'package:flutter_application_1/theme/app_colors.dart';
+import 'package:flutter_application_1/models/chat_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
@@ -15,175 +13,226 @@ class AIChatScreen extends ConsumerStatefulWidget {
 
 class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scroll = ScrollController();
 
   void _send() {
     if (_controller.text.trim().isEmpty) return;
     ref.read(chatProvider.notifier).sendMessage(_controller.text);
     _controller.clear();
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (_scroll.hasClients) {
+        _scroll.animateTo(
+          _scroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final messages = ref.watch(chatProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: const Color(0xFF0B0C0F),
+
       appBar: AppBar(
-        title: Text(
-          l10n.aiChat,
-          style: GoogleFonts.sora(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimaryLight,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: AppColors.textPrimaryLight,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          "Lawgix",
+          style: GoogleFonts.sora(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
+
       body: Column(
         children: [
+          /// Messages OR hero
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return ChatBubble(message: messages[index]);
-              },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
-              border: const Border(
-                top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-              ),
-            ),
-            child: Row(
-              children: [
-                // Voice Button
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Voice input not implemented'),
-                        ),
+            child: messages.isEmpty
+                ? _hero()
+                : ListView.builder(
+                    controller: _scroll,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
+                    itemCount: messages.length,
+                    itemBuilder: (context, i) {
+                      final msg = messages[i];
+                      return _bubble(
+                        msg.content,
+                        msg.role == ChatRole.user,
                       );
                     },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceLight,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFE2E8F0),
-                          width: 2,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.mic_none_rounded,
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
+          ),
 
-                // Text Input
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE2E8F0),
-                        width: 2,
-                      ),
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      style: GoogleFonts.sora(fontSize: 15),
-                      decoration: InputDecoration(
-                        hintText: "Ask a legal question...",
-                        hintStyle: GoogleFonts.sora(
-                          color: AppColors.textSecondaryLight,
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        filled: false,
-                      ),
-                      onSubmitted: (_) => _send(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
+          /// bottom input only when chat started
+          if (messages.isNotEmpty) _inputBar(),
+        ],
+      ),
+    );
+  }
 
-                // Send Button
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _send,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryLight],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.send_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+  /// ⭐ HERO (Gemini style)
+  Widget _hero() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.auto_awesome,
+                size: 48, color: Color(0xFF7C9BFF)),
+            const SizedBox(height: 20),
+
+            Text(
+              "Meet Lawgix,\nyour legal AI assistant",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.sora(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            _heroInput(),
+
+            const SizedBox(height: 20),
+
+            _suggestionPills(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// ⭐ Large hero input
+  Widget _heroInput() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1F24),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.add, color: Colors.grey),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: "Ask Lawgix…",
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+              ),
+              onSubmitted: (_) => _send(),
             ),
           ),
+          IconButton(
+            icon: const Icon(Icons.send, color: Colors.grey),
+            onPressed: _send,
+          ),
         ],
+      ),
+    );
+  }
+
+  /// ⭐ Suggestion pills
+  Widget _suggestionPills() {
+    final items = [
+      "Contract review",
+      "Property dispute",
+      "Divorce process",
+      "Startup legal"
+    ];
+
+    return Wrap(
+      spacing: 10,
+      children: items.map((e) {
+        return GestureDetector(
+          onTap: () {
+            _controller.text = e;
+            _send();
+          },
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1F24),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child:
+                Text(e, style: const TextStyle(color: Colors.white70)),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// ⭐ Bubble
+  Widget _bubble(String text, bool isUser) {
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(14),
+        constraints: const BoxConstraints(maxWidth: 420),
+        decoration: BoxDecoration(
+          color: isUser
+              ? const Color(0xFF5B7FFF)
+              : const Color(0xFF1E1F24),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.sora(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  /// ⭐ Bottom input after chat starts
+  Widget _inputBar() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1F24),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.mic_none, color: Colors.grey),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: "Ask Lawgix…",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
+                ),
+                onSubmitted: (_) => _send(),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed: _send,
+            )
+          ],
+        ),
       ),
     );
   }

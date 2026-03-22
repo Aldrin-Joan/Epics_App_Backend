@@ -15,7 +15,7 @@ class LawyerDashboard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.lawyer),
@@ -27,12 +27,21 @@ class LawyerDashboard extends ConsumerWidget {
                 icon: Icon(Icons.auto_awesome_outlined),
                 text: 'AI Tools',
               ),
+              const Tab(
+                icon: Icon(Icons.person_outline),
+                text: 'Profile',
+              ),
             ],
           ),
         ),
 
         body: const TabBarView(
-          children: [SocialFeed(), InboxView(), AIToolsView()],
+          children: [
+            SocialFeed(),
+            InboxView(),
+            AIToolsView(),
+            LawyerProfileView(),
+          ],
         ),
 
         floatingActionButton: FloatingActionButton.extended(
@@ -64,6 +73,7 @@ class SocialFeed extends ConsumerWidget {
     final posts = ref.watch(feedProvider);
 
     return ListView.builder(
+      padding: const EdgeInsets.only(top: 12, bottom: 80),
       itemCount: posts.length,
       itemBuilder: (_, i) => FeedCard(post: posts[i]),
     );
@@ -77,41 +87,31 @@ class FeedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(feedProvider.notifier);
+    final scheme = Theme.of(context).colorScheme;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.backgroundLight,
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: const Icon(
-                  Icons.person_rounded,
-                  color: AppColors.textSecondaryLight,
-                ),
+              CircleAvatar(
+                backgroundColor: scheme.surfaceVariant,
+                child: Icon(Icons.person, color: scheme.onSurface),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,53 +119,38 @@ class FeedCard extends ConsumerWidget {
                     Text(
                       post.author,
                       style: GoogleFonts.sora(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w600,
+                        color: scheme.onSurface,
                       ),
                     ),
                     Text(
-                      post.title, // Treating title as role/subtitle for now
+                      post.title,
                       style: GoogleFonts.sora(
                         fontSize: 12,
-                        color: AppColors.textSecondaryLight,
+                        color: scheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  controller.toggleFollow(post.id);
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: post.following
-                      ? AppColors.textSecondaryLight
-                      : AppColors.primary,
-                  textStyle: GoogleFonts.sora(fontWeight: FontWeight.w600),
-                ),
+                onPressed: () => controller.toggleFollow(post.id),
                 child: Text(post.following ? 'Following' : 'Follow'),
-              ),
+              )
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             post.content,
-            style: GoogleFonts.sora(
-              fontSize: 14,
-              height: 1.5,
-              color: AppColors.textPrimaryLight,
-            ),
+            style: GoogleFonts.sora(color: scheme.onSurface),
           ),
-          const SizedBox(height: 16),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
           const SizedBox(height: 12),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _ActionButton(
                 icon: post.liked
-                    ? Icons.thumb_up_rounded
+                    ? Icons.thumb_up
                     : Icons.thumb_up_outlined,
                 label: '${post.likes}',
                 isActive: post.liked,
@@ -174,24 +159,18 @@ class FeedCard extends ConsumerWidget {
               _ActionButton(
                 icon: Icons.comment_outlined,
                 label: 'Comment',
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => const CommentDialog(),
-                  );
-                },
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (_) => const CommentDialog(),
+                ),
               ),
               _ActionButton(
                 icon: Icons.share_outlined,
                 label: 'Share',
-                onTap: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('Link copied')));
-                },
+                onTap: () {},
               ),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -213,33 +192,18 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = isActive
+        ? AppColors.primary
+        : Theme.of(context).colorScheme.onSurfaceVariant;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isActive
-                  ? AppColors.primary
-                  : AppColors.textSecondaryLight,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: GoogleFonts.sora(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isActive
-                    ? AppColors.primary
-                    : AppColors.textSecondaryLight,
-              ),
-            ),
-          ],
-        ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(width: 6),
+          Text(label, style: GoogleFonts.sora(color: color)),
+        ],
       ),
     );
   }
@@ -250,130 +214,25 @@ class InboxView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.all(24),
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
       itemCount: 3,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (_, i) => _InboxItem(index: i),
-    );
-  }
-}
-
-class _InboxItem extends StatelessWidget {
-  final int index;
-
-  const _InboxItem({required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    final hasUnread = index == 0; // Demo logic
-
-    return InkWell(
-      onTap: () => context.push('/lawyer-to-client-chat'),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: hasUnread
-                ? AppColors.primary.withOpacity(0.3)
-                : const Color(0xFFE2E8F0),
-            width: hasUnread ? 2 : 1,
+      itemBuilder: (_, i) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.person_rounded,
-                    color: AppColors.textSecondaryLight,
-                    size: 28,
-                  ),
-                ),
-                if (hasUnread)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: AppColors.error,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Client Name ${index + 1}',
-                        style: GoogleFonts.sora(
-                          fontSize: 15,
-                          fontWeight: hasUnread
-                              ? FontWeight.bold
-                              : FontWeight.w600,
-                          color: AppColors.textPrimaryLight,
-                        ),
-                      ),
-                      Text(
-                        '10:30 AM',
-                        style: GoogleFonts.sora(
-                          fontSize: 12,
-                          color: hasUnread
-                              ? AppColors.primary
-                              : AppColors.textSecondaryLight,
-                          fontWeight: hasUnread
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Thank you for the advice regarding the property dispute. I have a few more questions.',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.sora(
-                      fontSize: 13,
-                      color: hasUnread
-                          ? AppColors.textPrimaryLight
-                          : AppColors.textSecondaryLight,
-                      fontWeight: hasUnread ? FontWeight.w500 : FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          child: ListTile(
+            onTap: () => context.push('/lawyer-to-client-chat'),
+            leading: const CircleAvatar(child: Icon(Icons.person)),
+            title: Text("Client ${i + 1}"),
+            subtitle: const Text("New legal query..."),
+          ),
+        );
+      },
     );
   }
 }
@@ -389,23 +248,78 @@ class AIToolsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.auto_awesome, size: 80, color: scheme.primary),
-          const SizedBox(height: 16),
+          Icon(Icons.auto_awesome, size: 60, color: scheme.primary),
+          const SizedBox(height: 12),
           Text(
-            'Lawyer AI Assistant',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: scheme.primary),
+            "AI Assistant",
+            style: GoogleFonts.sora(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: scheme.primary,
+            ),
           ),
-          const SizedBox(height: 8),
-          const Text('Summarize docs, research case laws, and more.'),
-          const SizedBox(height: 24),
-          FilledButton.icon(
+          const SizedBox(height: 10),
+          FilledButton(
             onPressed: () => context.push('/ai-chat'),
-            icon: const Icon(Icons.analytics),
-            label: const Text('Analyze Case File'),
-          ),
+            child: const Text("Open AI Chat"),
+          )
         ],
+      ),
+    );
+  }
+}
+
+class LawyerProfileView extends StatelessWidget {
+  const LawyerProfileView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: scheme.primaryContainer,
+            child: Icon(Icons.person, size: 40, color: scheme.primary),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "Adv. Lawyer",
+            style: GoogleFonts.sora(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          _tile(context, "Edit Profile"),
+          _tile(context, "My Clients"),
+          _tile(context, "Settings"),
+
+          const Spacer(),
+
+         TextButton(
+  onPressed: () => context.go('/auth'), 
+  child: const Text("Logout"),
+)
+        ],
+      ),
+    );
+  }
+
+  Widget _tile(BuildContext context, String title) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        title: Text(title),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       ),
     );
   }
@@ -458,9 +372,6 @@ class CommentDialog extends StatelessWidget {
         FilledButton(
           onPressed: () {
             Navigator.pop(context);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Comment posted')));
           },
           child: const Text('Post'),
         ),
