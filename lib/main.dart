@@ -74,10 +74,10 @@ final routerProvider = Provider<GoRouter>((ref) {
        builder: (context, state) => 
        const PersonalInfoScreen(),
       ),
-      GoRoute(path: '/security', builder: (_, __) => const SecurityScreen()),
-GoRoute(path: '/payments', builder: (_, __) => const PaymentScreen()),
-GoRoute(path: '/notifications', builder: (_, __) => const NotificationScreen()),
-GoRoute(path: '/help', builder: (_, __) => const HelpScreen()),
+      GoRoute(path: '/security', builder: (_, _) => const SecurityScreen()),
+GoRoute(path: '/payments', builder: (_, _) => const PaymentScreen()),
+GoRoute(path: '/notifications', builder: (_, _) => const NotificationScreen()),
+GoRoute(path: '/help', builder: (_, _) => const HelpScreen()),
     ],
   );
 });

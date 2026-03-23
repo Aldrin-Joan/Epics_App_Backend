@@ -108,7 +108,7 @@ class FeedCard extends ConsumerWidget {
           Row(
             children: [
               CircleAvatar(
-                backgroundColor: scheme.surfaceVariant,
+                backgroundColor: scheme.surfaceContainerHighest,
                 child: Icon(Icons.person, color: scheme.onSurface),
               ),
               const SizedBox(width: 10),
