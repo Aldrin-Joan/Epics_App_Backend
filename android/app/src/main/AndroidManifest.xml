@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Microphone: required for voice recording via the `record` package -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- Internet: required for API calls to the FastAPI backend -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="flutter_application_1"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

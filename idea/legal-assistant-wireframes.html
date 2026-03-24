@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal AI Assistant - Modern UI Wireframes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1E3A8A;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E293B;
+            --accent: #10B981;
+            --accent-teal: #14B8A6;
+            --background: #F8FAFC;
+            --surface: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .wireframe-container {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 1400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .screen-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .screen-card:hover {
+            border-color: var(--primary-light);
+        }
+
+        .screen-label {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+        }
+
+        .phone-frame {
+            background: var(--background);
+            padding: 24px;
+            position: relative;
+            aspect-ratio: 9 / 19.5;
+            overflow: hidden;
+        }
+
+        /* Mobile Screen Base Styles */
+        .mobile-screen {
+            background: var(--background);
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            height: 24px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .header {
+            padding: 20px 20px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Login Screen */
+        .login-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 32px 24px;
+        }
+
+        .login-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 40px 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .welcome-subtext {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+            font-weight: 300;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: var(--background);
+            color: var(--text-primary);
+            font-family: 'Sora', sans-serif;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .primary-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .primary-button:hover {
+            opacity: 0.9;
+        }
+
+        .link-text {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .link-text span {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 32px;
+            right: 24px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* Dashboard Screen */
+        .greeting-section {
+            padding: 24px 20px;
+        }
+
+        .greeting-title {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .greeting-message {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--background) 100%);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .action-card:hover {
+            border-color: var(--primary-light);
+        }
+
+        .action-card.purple {
+            border-color: #C4B5FD;
+        }
+
+        .action-card.green {
+            border-color: #A7F3D0;
+        }
+
+        .action-card.amber {
+            border-color: #FDE68A;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+            background: var(--surface);
+        }
+
+        .action-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .action-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding: 0 20px;
+        }
+
+        .consultation-list {
+            padding: 0 20px;
+        }
+
+        .consultation-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+        }
+
+        .consultation-item:hover {
+            border-color: var(--primary);
+        }
+
+        .consultation-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .consultation-details {
+            flex: 1;
+        }
+
+        .consultation-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .consultation-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .consultation-arrow {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 12px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 20px;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover {
+            background: var(--background);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+        }
+
+        .nav-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .nav-item.active .nav-indicator {
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+
+        /* Chat Screen */
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            max-width: 85%;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chat-message.bot {
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            border-color: #C7D2FE;
+        }
+
+        .chat-input-container {
+            position: sticky;
+            bottom: 0;
+            padding: 16px 20px 24px;
+            background: var(--background);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .voice-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: var(--surface);
+            font-family: 'Sora', sans-serif;
+        }
+
+        .send-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Upload Screen */
+        .upload-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .upload-card {
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: 24px;
+            padding: 48px 32px;
+            text-align: center;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .upload-card:hover {
+            border-color: var(--primary);
+            background: var(--background);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .upload-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .file-status {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Lawyers List */
+        .lawyers-list {
+            padding: 20px;
+        }
+
+        .lawyer-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+        }
+
+        .lawyer-card:hover {
+            border-color: var(--primary);
+        }
+
+        .lawyer-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .lawyer-info {
+            flex: 1;
+        }
+
+        .lawyer-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .lawyer-specialties {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            color: var(--primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* Profile Screen */
+        .profile-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 48px 32px;
+            text-align: center;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .profile-email {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .signout-button {
+            background: linear-gradient(135deg, var(--error) 0%, #DC2626 100%);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* Lawyer Dashboard */
+        .lawyer-tabs {
+            display: flex;
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            padding: 0 20px;
+        }
+
+        .lawyer-tab {
+            flex: 1;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .lawyer-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .lawyer-tab-icon {
+            display: block;
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .feed-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .post-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .post-author-info {
+            flex: 1;
+        }
+
+        .post-author {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .post-specialty {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .follow-button {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .post-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .post-content {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 24px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .fab-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--success) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 16px rgba(20, 184, 166, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Inbox */
+        .message-list {
+            padding: 20px;
+        }
+
+        .message-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .message-info {
+            flex: 1;
+        }
+
+        .message-sender {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .message-preview {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* AI Tools */
+        .ai-tools-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .ai-tools-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .ai-tools-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .ai-tools-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .analyze-button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .modal-button.cancel {
+            background: var(--background);
+            color: var(--text-secondary);
+        }
+
+        .modal-button.confirm {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .screens-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wireframe-container">
+        <h1>Legal AI Assistant</h1>
+        <p class="subtitle">Modern UI Wireframes for Flutter Development - 9 Screens</p>
+
+        <div class="screens-grid">
+            <!-- Screen 1: Login -->
+            <div class="screen-card">
+                <div class="screen-label">01 — Login Screen</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <select class="language-selector">
+                            <option>English</option>
+                        </select>
+                        <div class="login-content">
+                            <div class="login-card">
+                                <h2 class="welcome-text">Welcome to your Legal Assistant</h2>
+                                <p class="welcome-subtext">Sign in to continue</p>
+                                <div class="input-group">
+                                    <input type="email" class="input-field" placeholder="Email address">
+                                </div>
+                                <div class="input-group">
+                                    <input type="password" class="input-field" placeholder="Password">
+                                </div>
+                                <button class="primary-button">Sign In</button>
+                                <p class="link-text">Don't have an account? <span>Sign Up</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 2: Client Dashboard -->
+            <div class="screen-card">
+                <div class="screen-label">02 — Client Dashboard</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <span class="header-title">Client</span>
+                            <div class="back-button">⚙</div>
+                        </div>
+                        <div class="greeting-section">
+                            <p class="greeting-title">Welcome back,</p>
+                            <h2 class="greeting-message">How can we help you today?</h2>
+                            <div class="action-cards">
+                                <div class="action-card purple">
+                                    <div class="action-icon">📋</div>
+                                    <h3 class="action-title">Legal AI</h3>
+                                    <p class="action-subtitle">Ask questions</p>
+                                </div>
+                                <div class="action-card green">
+                                    <div class="action-icon">📤</div>
+                                    <h3 class="action-title">Upload</h3>
+                                    <p class="action-subtitle">Documents</p>
+                                </div>
+                                <div class="action-card amber">
+                                    <div class="action-icon">👤</div>
+                                    <h3 class="action-title">Find Lawyers</h3>
+                                    <p class="action-subtitle">Get expert help</p>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="section-title">Recent Consultations</h3>
+                        <div class="consultation-list">
+                            <div class="consultation-item">
+                                <div class="consultation-icon">💬</div>
+                                <div class="consultation-details">
+                                    <h4 class="consultation-title">Consultation #1</h4>
+                                    <p class="consultation-meta">Property Law • 2 days ago</p>
+                                </div>
+                                <span class="consultation-arrow">›</span>
+                            </div>
+                            <div class="consultation-item">
+                                <div class="consultation-icon">💬</div>
+                                <div class="consultation-details">
+                                    <h4 class="consultation-title">Consultation #2</h4>
+                                    <p class="consultation-meta">Property Law • 2 days ago</p>
+                                </div>
+                                <span class="consultation-arrow">›</span>
+                            </div>
+                            <div class="consultation-item">
+                                <div class="consultation-icon">💬</div>
+                                <div class="consultation-details">
+                                    <h4 class="consultation-title">Consultation #3</h4>
+                                    <p class="consultation-meta">Property Law • 2 days ago</p>
+                                </div>
+                                <span class="consultation-arrow">›</span>
+                            </div>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <span class="nav-icon">◫</span>
+                                <span class="nav-label">Dashboard</span>
+                                <div class="nav-indicator"></div>
+                            </div>
+                            <div class="nav-item">
+                                <span class="nav-icon">💬</span>
+                                <span class="nav-label">Chat</span>
+                            </div>
+                            <div class="nav-item">
+                                <span class="nav-icon">👤</span>
+                                <span class="nav-label">Profile</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 3: Chat -->
+            <div class="screen-card">
+                <div class="screen-label">03 — AI Chat Interface</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <div class="back-button">←</div>
+                            <span class="header-title">Legal AI Chat</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="chat-container">
+                            <div class="chat-message bot">
+                                Hello! I am your Legal AI assistant. How can I help you with your case details today?
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <div class="chat-input-wrapper">
+                                <div class="voice-button">🎤</div>
+                                <input type="text" class="chat-input" placeholder="Enter your legal query...">
+                                <button class="send-button">▶</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 4: Upload Documents -->
+            <div class="screen-card">
+                <div class="screen-label">04 — Upload Documents</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <div class="back-button">←</div>
+                            <span class="header-title">Upload Documents</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="upload-container">
+                            <div class="upload-card">
+                                <div class="upload-icon">☁</div>
+                                <h3 class="upload-title">Upload Case Documents</h3>
+                                <p class="upload-subtitle">PDF, DOCX, or images supported</p>
+                                <button class="upload-button">
+                                    <span>📎</span>
+                                    Select File
+                                </button>
+                                <p class="file-status">No file selected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 5: Find Lawyers -->
+            <div class="screen-card">
+                <div class="screen-label">05 — Find Lawyers</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <div class="back-button">←</div>
+                            <span class="header-title">Find Lawyers</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="lawyers-list">
+                            <div class="lawyer-card">
+                                <div class="lawyer-avatar">1</div>
+                                <div class="lawyer-info">
+                                    <h4 class="lawyer-name">Adv. Lawyer 1</h4>
+                                    <p class="lawyer-specialties">Property, Contracts, IP</p>
+                                </div>
+                                <button class="contact-button">Contact</button>
+                            </div>
+                            <div class="lawyer-card">
+                                <div class="lawyer-avatar">2</div>
+                                <div class="lawyer-info">
+                                    <h4 class="lawyer-name">Adv. Lawyer 2</h4>
+                                    <p class="lawyer-specialties">Property, Contracts, IP</p>
+                                </div>
+                                <button class="contact-button">Contact</button>
+                            </div>
+                            <div class="lawyer-card">
+                                <div class="lawyer-avatar">3</div>
+                                <div class="lawyer-info">
+                                    <h4 class="lawyer-name">Adv. Lawyer 3</h4>
+                                    <p class="lawyer-specialties">Property, Contracts, IP</p>
+                                </div>
+                                <button class="contact-button">Contact</button>
+                            </div>
+                            <div class="lawyer-card">
+                                <div class="lawyer-avatar">4</div>
+                                <div class="lawyer-info">
+                                    <h4 class="lawyer-name">Adv. Lawyer 4</h4>
+                                    <p class="lawyer-specialties">Property, Contracts, IP</p>
+                                </div>
+                                <button class="contact-button">Contact</button>
+                            </div>
+                            <div class="lawyer-card">
+                                <div class="lawyer-avatar">5</div>
+                                <div class="lawyer-info">
+                                    <h4 class="lawyer-name">Adv. Lawyer 5</h4>
+                                    <p class="lawyer-specialties">Property, Contracts, IP</p>
+                                </div>
+                                <button class="contact-button">Contact</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 6: Profile -->
+            <div class="screen-card">
+                <div class="screen-label">06 — User Profile</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <div class="back-button">←</div>
+                            <span class="header-title">Profile</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="profile-container">
+                            <div class="profile-card">
+                                <div class="profile-avatar">👤</div>
+                                <h3 class="profile-name">User Name</h3>
+                                <p class="profile-email">user@example.com</p>
+                                <button class="signout-button">
+                                    <span>🚪</span>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 7: Lawyer Social Feed -->
+            <div class="screen-card">
+                <div class="screen-label">07 — Lawyer Social Feed</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <span class="header-title">Lawyer</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="lawyer-tabs">
+                            <div class="lawyer-tab active">
+                                <span class="lawyer-tab-icon">📰</span>
+                                <span>Social Feed</span>
+                            </div>
+                            <div class="lawyer-tab">
+                                <span class="lawyer-tab-icon">📬</span>
+                                <span>Inbox</span>
+                            </div>
+                            <div class="lawyer-tab">
+                                <span class="lawyer-tab-icon">✨</span>
+                                <span>AI Tools</span>
+                            </div>
+                        </div>
+                        <div class="feed-container">
+                            <div class="post-card">
+                                <div class="post-header">
+                                    <div class="post-avatar">1</div>
+                                    <div class="post-author-info">
+                                        <div class="post-author">Adv. Senior Professional 1</div>
+                                        <div class="post-specialty">New Amendment in Patent Law</div>
+                                    </div>
+                                    <button class="follow-button">Follow</button>
+                                </div>
+                                <p class="post-content">I just read the latest Supreme Court judgment on data privacy...</p>
+                                <div class="post-actions">
+                                    <span class="post-action">👍 0</span>
+                                    <span class="post-action">💬</span>
+                                    <span class="post-action">↗</span>
+                                </div>
+                            </div>
+                            <div class="post-card">
+                                <div class="post-header">
+                                    <div class="post-avatar">2</div>
+                                    <div class="post-author-info">
+                                        <div class="post-author">Adv. Senior Professional 2</div>
+                                        <div class="post-specialty">New Amendment in Patent Law</div>
+                                    </div>
+                                    <button class="follow-button">Follow</button>
+                                </div>
+                                <p class="post-content">I just read the latest Supreme Court judgment on data privacy...</p>
+                                <div class="post-actions">
+                                    <span class="post-action">👍 0</span>
+                                    <span class="post-action">💬</span>
+                                    <span class="post-action">↗</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="fab-button">+ New Post</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 8: Lawyer Inbox -->
+            <div class="screen-card">
+                <div class="screen-label">08 — Lawyer Inbox</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <span class="header-title">Lawyer</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="lawyer-tabs">
+                            <div class="lawyer-tab">
+                                <span class="lawyer-tab-icon">📰</span>
+                                <span>Social Feed</span>
+                            </div>
+                            <div class="lawyer-tab active">
+                                <span class="lawyer-tab-icon">📬</span>
+                                <span>Inbox</span>
+                            </div>
+                            <div class="lawyer-tab">
+                                <span class="lawyer-tab-icon">✨</span>
+                                <span>AI Tools</span>
+                            </div>
+                        </div>
+                        <div class="message-list">
+                            <div class="message-item">
+                                <div class="message-avatar">👤</div>
+                                <div class="message-info">
+                                    <div class="message-sender">Client Name 1</div>
+                                    <div class="message-preview">Thank you for the advice.</div>
+                                </div>
+                                <span class="message-time">10:30 AM</span>
+                            </div>
+                            <div class="message-item">
+                                <div class="message-avatar">👤</div>
+                                <div class="message-info">
+                                    <div class="message-sender">Client Name 2</div>
+                                    <div class="message-preview">Thank you for the advice.</div>
+                                </div>
+                                <span class="message-time">10:30 AM</span>
+                            </div>
+                            <div class="message-item">
+                                <div class="message-avatar">👤</div>
+                                <div class="message-info">
+                                    <div class="message-sender">Client Name 3</div>
+                                    <div class="message-preview">Thank you for the advice.</div>
+                                </div>
+                                <span class="message-time">10:30 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 9: Lawyer AI Tools -->
+            <div class="screen-card">
+                <div class="screen-label">09 — Lawyer AI Tools</div>
+                <div class="phone-frame">
+                    <div class="mobile-screen">
+                        <div class="status-bar">
+                            <span>11:03</span>
+                            <span>◯ ◐ ●</span>
+                        </div>
+                        <div class="header">
+                            <span class="header-title">Lawyer</span>
+                            <div style="width: 40px;"></div>
+                        </div>
+                        <div class="lawyer-tabs">
+                            <div class="lawyer-tab">
+                                <span class="lawyer-tab-icon">📰</span>
+                                <span>Social Feed</span>
+                            </div>
+                            <div class="lawyer-tab">
+                                <span class="lawyer-tab-icon">📬</span>
+                                <span>Inbox</span>
+                            </div>
+                            <div class="lawyer-tab active">
+                                <span class="lawyer-tab-icon">✨</span>
+                                <span>AI Tools</span>
+                            </div>
+                        </div>
+                        <div class="ai-tools-container">
+                            <div class="ai-tools-icon">✨</div>
+                            <h2 class="ai-tools-title">Lawyer AI Assistant</h2>
+                            <p class="ai-tools-subtitle">Summarize docs, research case laws, and more.</p>
+                            <button class="analyze-button">
+                                <span>📄</span>
+                                Analyze Case File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</body>
+</html>
