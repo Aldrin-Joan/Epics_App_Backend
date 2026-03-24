@@ -1,5 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from typing import List, Dict
+from typing import Dict
+from app.services.ai_service import AIService
 
 router = APIRouter(tags=["chat"])
 
@@ -27,11 +28,24 @@ manager = ConnectionManager()
 @router.websocket("/ws/chat/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: int):
     await manager.connect(user_id, websocket)
+
     try:
         while True:
-            data = await websocket.receive_text()
-            # In a real app, parse data to find receiver_id
-            # For demo, just echoing back
-            await manager.send_personal_message(f"Message received: {data}", user_id)
+            # Receive message from user
+            user_message = await websocket.receive_text()
+
+            try:
+                # Call AI service (RAG runs in background thread)
+                ai_response = await AIService.get_legal_advice(user_message)
+
+            except Exception as e:
+                # Prevent crash if AI fails
+                ai_response = "Sorry, an internal AI error occurred."
+                print(f"AI Error: {e}")
+
+            # Send response back to user
+            await manager.send_personal_message(ai_response, user_id)
+
     except WebSocketDisconnect:
         manager.disconnect(user_id)
+        print(f"User {user_id} disconnected.")
