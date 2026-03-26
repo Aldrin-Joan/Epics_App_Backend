@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:flutter_application_1/screens/lawyer/edit_profile_screen.dart';
+import 'package:flutter_application_1/screens/lawyer/my_clients_screen.dart';
+import 'package:flutter_application_1/screens/lawyer/lawyer_availability_screen.dart';
+
 import 'package:flutter_application_1/l10n/app_localizations.dart';
+import 'package:flutter_application_1/providers/language_provider.dart';
+import 'package:flutter_application_1/providers/theme_provider.dart';
+import 'package:flutter_application_1/theme/app_colors.dart';
+
+/// SCREENS
 import 'package:flutter_application_1/screens/auth_screen.dart';
 import 'package:flutter_application_1/screens/client_dashboard.dart';
 import 'package:flutter_application_1/screens/lawyer_dashboard.dart';
@@ -17,71 +29,68 @@ import 'package:flutter_application_1/screens/help_support_screen.dart';
 import 'package:flutter_application_1/screens/privacy_security_screen.dart';
 import 'package:flutter_application_1/screens/lawyer_to_client_chat_screen.dart';
 import 'package:flutter_application_1/screens/personal_info_screen.dart';
-import 'package:flutter_application_1/providers/language_provider.dart';
-import 'package:flutter_application_1/providers/theme_provider.dart'; 
-import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_application_1/theme/app_colors.dart';
 
 void main() {
   runApp(const ProviderScope(child: LegalTechApp()));
 }
 
+/// ✅ ROUTER
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/auth',
     routes: [
-      GoRoute(path: '/auth', builder: (context, state) => const AuthScreen()),
-      GoRoute(
-        path: '/client',
-        builder: (context, state) => const ClientDashboard(),
-      ),
-      GoRoute(
-        path: '/lawyer',
-        builder: (context, state) => const LawyerDashboard(),
-      ),
-      GoRoute(
-        path: '/ai-chat',
-        builder: (context, state) => const AIChatScreen(),
-      ),
-      GoRoute(
-        path: '/upload',
-        builder: (context, state) => const UploadScreen(),
-      ),
+      GoRoute(path: '/auth', builder: (_, __) => const AuthScreen()),
+      GoRoute(path: '/client', builder: (_, __) => const ClientDashboard()),
+      GoRoute(path: '/lawyer', builder: (_, __) => const LawyerDashboard()),
+      GoRoute(path: '/ai-chat', builder: (_, __) => const AIChatScreen()),
+      GoRoute(path: '/upload', builder: (_, __) => const UploadScreen()),
       GoRoute(
         path: '/find-lawyers',
-        builder: (context, state) => const FindLawyersScreen(),
+        builder: (_, __) => const FindLawyersScreen(),
       ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
+      GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
       GoRoute(
         path: '/lawyer-chat',
-        builder: (context, state) => const LawyerChatScreen(),
+        builder: (_, __) => const LawyerChatScreen(),
       ),
       GoRoute(
         path: '/lawyer-to-client-chat',
-        builder: (context, state) =>
-            const LawyerToClientChatScreen(),
+        builder: (_, __) => const LawyerToClientChatScreen(),
       ),
       GoRoute(
-  path: '/lawyer-profile',
-  builder: (context, state) => const LawyerProfileScreen(),
-),
+        path: '/lawyer/lawyer-profile',
+        builder: (_, __) => const LawyerProfileScreen(),
+      ),
+      GoRoute(
+        path: '/edit-profile',
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+
+      GoRoute(
+        path: '/my-clients',
+        builder: (context, state) => const MyClientsScreen(),
+      ),
+
+      GoRoute(
+        path: '/lawyer-availability',
+        builder: (context, state) => const LawyerAvailabilityScreen(),
+      ),
       GoRoute(
         path: '/personal-info',
-       builder: (context, state) => 
-       const PersonalInfoScreen(),
+        builder: (_, __) => const PersonalInfoScreen(),
       ),
       GoRoute(path: '/security', builder: (_, __) => const SecurityScreen()),
-GoRoute(path: '/payments', builder: (_, __) => const PaymentScreen()),
-GoRoute(path: '/notifications', builder: (_, __) => const NotificationScreen()),
-GoRoute(path: '/help', builder: (_, __) => const HelpScreen()),
+      GoRoute(path: '/payments', builder: (_, __) => const PaymentScreen()),
+      GoRoute(
+        path: '/notifications',
+        builder: (_, __) => const NotificationScreen(),
+      ),
+      GoRoute(path: '/help', builder: (_, __) => const HelpScreen()),
     ],
   );
 });
 
+/// ✅ APP
 class LegalTechApp extends ConsumerWidget {
   const LegalTechApp({super.key});
 
@@ -89,21 +98,24 @@ class LegalTechApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localeProvider);
-    final themeMode = ref.watch(themeModeProvider); 
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
       title: 'LegalTech Super App',
+      debugShowCheckedModeBanner: false,
+      routerConfig: router,
       locale: locale,
-      themeMode: themeMode, 
+      themeMode: themeMode,
       theme: _lightTheme(),
       darkTheme: _darkTheme(),
-      routerConfig: router,
+
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+
       supportedLocales: const [
         Locale('en'),
         Locale('ta'),
@@ -120,6 +132,7 @@ class LegalTechApp extends ConsumerWidget {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         primary: AppColors.primary,
@@ -128,35 +141,31 @@ class LegalTechApp extends ConsumerWidget {
         background: AppColors.backgroundLight,
         error: AppColors.error,
       ),
+
       scaffoldBackgroundColor: AppColors.backgroundLight,
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        selectedItemColor: AppColors.primary,
-        backgroundColor: AppColors.surfaceLight,
-        elevation: 0,
-      ),
+
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.textPrimaryLight,
         centerTitle: true,
       ),
-      textTheme:
-          GoogleFonts.soraTextTheme(ThemeData.light().textTheme).apply(
+
+      textTheme: GoogleFonts.soraTextTheme(ThemeData.light().textTheme).apply(
         bodyColor: AppColors.textPrimaryLight,
         displayColor: AppColors.textPrimaryLight,
       ),
+
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: AppColors.cardElevation,
         shadowColor: AppColors.cardShadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(
-            color: Color(0xFFE2E8F0),
-            width: 2,
-          ),
+          side: const BorderSide(color: Color(0xFFE2E8F0), width: 2),
         ),
       ),
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -172,13 +181,13 @@ class LegalTechApp extends ConsumerWidget {
           ),
         ),
       ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.backgroundLight,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide:
-              const BorderSide(color: Color(0xFFE2E8F0), width: 2),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 2),
         ),
       ),
     );
@@ -189,6 +198,7 @@ class LegalTechApp extends ConsumerWidget {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         brightness: Brightness.dark,
@@ -198,51 +208,19 @@ class LegalTechApp extends ConsumerWidget {
         background: AppColors.backgroundDark,
         error: AppColors.error,
       ),
+
       scaffoldBackgroundColor: AppColors.backgroundDark,
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        selectedItemColor: AppColors.primaryLight,
-        backgroundColor: AppColors.surfaceDark,
-        elevation: 0,
-      ),
+
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.textPrimaryDark,
         centerTitle: true,
       ),
-      textTheme:
-          GoogleFonts.soraTextTheme(ThemeData.dark().textTheme).apply(
+
+      textTheme: GoogleFonts.soraTextTheme(ThemeData.dark().textTheme).apply(
         bodyColor: AppColors.textPrimaryDark,
         displayColor: AppColors.textPrimaryDark,
-      ),
-      cardTheme: CardThemeData(
-        color: AppColors.surfaceDark,
-        elevation: AppColors.cardElevation,
-        shadowColor: Colors.black54,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.textPrimaryLight,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          textStyle: GoogleFonts.sora(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.backgroundDark,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
       ),
     );
   }
