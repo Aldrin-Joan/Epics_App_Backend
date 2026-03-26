@@ -10,6 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 /// ================= PROFILE =================
 ///
 class LawyerProfileView extends StatelessWidget {
+  const LawyerProfileView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(

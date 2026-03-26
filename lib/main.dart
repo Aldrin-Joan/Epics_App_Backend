@@ -39,27 +39,27 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/auth',
     routes: [
-      GoRoute(path: '/auth', builder: (_, __) => const AuthScreen()),
-      GoRoute(path: '/client', builder: (_, __) => const ClientDashboard()),
-      GoRoute(path: '/lawyer', builder: (_, __) => const LawyerDashboard()),
-      GoRoute(path: '/ai-chat', builder: (_, __) => const AIChatScreen()),
-      GoRoute(path: '/upload', builder: (_, __) => const UploadScreen()),
+      GoRoute(path: '/auth', builder: (_, _) => const AuthScreen()),
+      GoRoute(path: '/client', builder: (_, _) => const ClientDashboard()),
+      GoRoute(path: '/lawyer', builder: (_, _) => const LawyerDashboard()),
+      GoRoute(path: '/ai-chat', builder: (_, _) => const AIChatScreen()),
+      GoRoute(path: '/upload', builder: (_, _) => const UploadScreen()),
       GoRoute(
         path: '/find-lawyers',
-        builder: (_, __) => const FindLawyersScreen(),
+        builder: (_, _) => const FindLawyersScreen(),
       ),
-      GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+      GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
       GoRoute(
         path: '/lawyer-chat',
-        builder: (_, __) => const LawyerChatScreen(),
+        builder: (_, _) => const LawyerChatScreen(),
       ),
       GoRoute(
         path: '/lawyer-to-client-chat',
-        builder: (_, __) => const LawyerToClientChatScreen(),
+        builder: (_, _) => const LawyerToClientChatScreen(),
       ),
       GoRoute(
         path: '/lawyer/lawyer-profile',
-        builder: (_, __) => const LawyerProfileScreen(),
+        builder: (_, _) => const LawyerProfileScreen(),
       ),
       GoRoute(
         path: '/edit-profile',
@@ -77,20 +77,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/personal-info',
-        builder: (_, __) => const PersonalInfoScreen(),
+        builder: (_, _) => const PersonalInfoScreen(),
       ),
 GoRoute(
   path: '/personal-info',
-  builder: (_, __) => const PersonalInfoScreen(),
+  builder: (_, _) => const PersonalInfoScreen(),
 ),
 
-GoRoute(path: '/security', builder: (_, __) => const SecurityScreen()),
-GoRoute(path: '/payments', builder: (_, __) => const PaymentScreen()),
+GoRoute(path: '/security', builder: (_, _) => const SecurityScreen()),
+GoRoute(path: '/payments', builder: (_, _) => const PaymentScreen()),
 GoRoute(
   path: '/notifications',
-  builder: (_, __) => const NotificationScreen(),
+  builder: (_, _) => const NotificationScreen(),
 ),
-GoRoute(path: '/help', builder: (_, __) => const HelpScreen()),
+GoRoute(path: '/help', builder: (_, _) => const HelpScreen()),
     ],
   );
 });
