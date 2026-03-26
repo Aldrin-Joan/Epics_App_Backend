@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_application_1/providers/chat_controller.dart';
 import 'package:flutter_application_1/models/chat_message.dart';
+import 'package:flutter_application_1/theme/app_colors.dart';
+import 'package:flutter_application_1/widgets/chat_bubble.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -76,7 +78,9 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Microphone permission is required for voice queries.'),
+            content: Text(
+              'Microphone permission is required for voice queries.',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -186,12 +190,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
                                       color: Colors.red.withOpacity(0.3),
                                       blurRadius: 8,
                                       spreadRadius: 2,
-                                    )
+                                    ),
                                   ]
                                 : [],
                           ),
                           child: Icon(
-                            _isRecording ? Icons.stop_rounded : Icons.mic_rounded,
+                            _isRecording
+                                ? Icons.stop_rounded
+                                : Icons.mic_rounded,
                             color: _isRecording
                                 ? Colors.red
                                 : AppColors.textSecondaryLight,
