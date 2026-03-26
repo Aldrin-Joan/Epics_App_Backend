@@ -1,9 +1,12 @@
+# ============================================================
 # Miscellaneous
+# ============================================================
 *.class
 *.log
 *.pyc
 *.swp
 .DS_Store
+Thumbs.db
 .atom/
 .build/
 .buildlog/
@@ -12,54 +15,80 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# ============================================================
+# IntelliJ / VS Code
+# ============================================================
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
+# ============================================================
+# Flutter / Dart / Pub
+# ============================================================
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
 /coverage/
+.packages
 
-# Symbolication related
+# Symbolication / Obfuscation
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android Studio build artifacts
 /android/app/debug
 /android/app/profile
 /android/app/release
 
-
+# ============================================================
+# Python / Backend
+# ============================================================
+backend/venv/
 venv/
-__pycache__/
-data/
-test_rag.py
+**/__pycache__/
 *.pyc
-# Data
-data/raw_pdfs/
-data/processed/
-data/*.index
-data/*.json
-data/*.pkl
-
-# HuggingFace cache
+*.pyo
+*.pyd
+.pytest_cache/
 .cache/
 
-# Python
-venv/
-__pycache__/
+# HuggingFace model cache
+.cache/huggingface/
+
+# ============================================================
+# Backend Runtime Data (temp + generated audio — NOT the index)
+# ============================================================
+backend/data/temp/
+backend/data/audio/
+backend/ffmpeg.zip
+
+# Large ML model / FAISS data files (too large for git — share via Drive/DVC)
+backend/data/faiss_index.index
+backend/data/faiss*.index
+backend/data/faiss_metadata.json
+backend/data/metadata.pkl
+backend/data/*.index
+backend/data/*.pkl
+
+# Raw / processed data that should not be in git
+backend/data/raw_pdfs/
+backend/data/processed/
+
+# ============================================================
+# Test artifacts
+# ============================================================
+backend/scripts/test_results*.txt
+backend/scripts/_test_*.mp3
+test_*.mp3
+
+# ============================================================
+# OS
+# ============================================================
+.DS_Store
+Thumbs.db

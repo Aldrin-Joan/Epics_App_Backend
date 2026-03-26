@@ -52,9 +52,11 @@ dependencies:
   file_picker: ^10.3.8
   shared_preferences: ^2.3.3
 
-  # Speech
-  speech_to_text: ^7.3.0
-  flutter_tts: ^4.2.0
+  # Audio recording & playback (for Whisper-based voice pipeline)
+  record: ^6.2.0
+  audioplayers: ^6.1.0
+  path_provider: ^2.1.4
+  permission_handler: ^11.3.1
 
   # Serialization
   json_annotation: ^4.9.0

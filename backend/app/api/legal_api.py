@@ -1,7 +1,14 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+import os
+import shutil
+import uuid
 from app.services.ai_service import AIService
 from app.services.file_service import FileService
-from pydantic import BaseModel
+from app.services.translation_service import TranslationService
+from app.services.voice.stt import transcribe_audio
+from app.services.voice.tts import text_to_speech
 
 router = APIRouter(prefix="/legal", tags=["legal"])
 
@@ -12,8 +19,8 @@ class ChatQuery(BaseModel):
 
 @router.post("/ai-chat")
 async def ai_chat(query: ChatQuery):
-    response = await AIService.get_legal_advice(query.message)
-    return {"response": response, "type": "text"}
+    answer, sources = await AIService.get_legal_advice(query.message)
+    return {"response": answer, "sources": sources, "type": "text"}
 
 
 @router.post("/upload-document")
@@ -52,3 +59,67 @@ async def get_lawyers():
             "rating": 4.7,
         },
     ]
+
+
+@router.post("/voice-query")
+async def voice_query(file: UploadFile = File(...), language: str = Form(None)):
+    if not file.filename.endswith((".wav", ".mp3", ".m4a", ".ogg", ".aac")):
+        raise HTTPException(status_code=400, detail="Unsupported audio format")
+
+    # Ignore swagger's default value for string
+    if language == "string":
+        language = None
+
+    # Save audio temporarily
+    temp_dir = os.path.join(os.getcwd(), "backend", "data", "temp")
+    os.makedirs(temp_dir, exist_ok=True)
+    temp_audio_path = os.path.join(temp_dir, f"{uuid.uuid4()}_{file.filename}")
+    
+    with open(temp_audio_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    try:
+        # Step 1: STT
+        try:
+            transcription = transcribe_audio(temp_audio_path)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"STT Error: {str(e)}")
+        
+        # Determine language for TTS. 
+        translator = TranslationService()
+        source_lang = language or translator.detect_language(transcription)
+
+        # Restrict TTS Languages (Fix 3)
+        supported_langs = ["en", "hi", "ta", "te", "kn", "ml", "bn", "es", "fr"]
+        if source_lang not in supported_langs:
+            source_lang = "en"
+
+        # Step 2: Get Answer (AIService handles translation and RAG)
+        answer_text, expanded_sources = await AIService.get_legal_advice(transcription)
+        
+        # Step 3: TTS
+        audio_filename = f"response_{uuid.uuid4()}.mp3"
+        audio_filepath = os.path.join(os.getcwd(), "backend", "data", "audio", audio_filename)
+        os.makedirs(os.path.dirname(audio_filepath), exist_ok=True)
+        
+        # langdetect returns 'en', 'hi', etc which aligns well with gTTS
+        output_path = text_to_speech(answer_text, lang=source_lang, output_path=audio_filepath)
+        
+        # Return response
+        return {
+            "transcription": transcription,
+            "answer_text": answer_text,
+            "audio_url": f"/legal/audio/{audio_filename}",
+            "sources": expanded_sources
+        }
+    finally:
+        if os.path.exists(temp_audio_path):
+            os.remove(temp_audio_path)
+
+
+@router.get("/audio/{filename}")
+async def get_audio(filename: str):
+    file_path = os.path.join(os.getcwd(), "backend", "data", "audio", filename)
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="audio/mpeg")
+    raise HTTPException(status_code=404, detail="Audio file not found")

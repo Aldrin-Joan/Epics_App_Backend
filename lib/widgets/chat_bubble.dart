@@ -1,25 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_application_1/models/chat_message.dart';
 import 'package:flutter_application_1/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ChatBubble extends StatelessWidget {
+class ChatBubble extends StatefulWidget {
   final ChatMessage message;
   final bool? isMeOverride;
 
   const ChatBubble({super.key, required this.message, this.isMeOverride});
 
   @override
+  State<ChatBubble> createState() => _ChatBubbleState();
+}
+
+class _ChatBubbleState extends State<ChatBubble> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggleAudio(String url) async {
+    if (_isPlaying) {
+      await _audioPlayer.stop();
+      setState(() => _isPlaying = false);
+    } else {
+      setState(() => _isPlaying = true);
+      await _audioPlayer.play(UrlSource(url));
+      _audioPlayer.onPlayerComplete.listen((_) {
+        if (mounted) setState(() => _isPlaying = false);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final message = widget.message;
     final isUserRole = message.role == ChatRole.user;
     final isLawyerScale = message.role == ChatRole.lawyer;
     final isAI = message.role == ChatRole.ai;
-
-    // Determine if this message is "Mine" (Sent by me)
-    // Default: 'User' role is Me.
-    // If override provided, use that.
-    final isMe = isMeOverride ?? isUserRole; // Use the field from the class
+    final isMe = widget.isMeOverride ?? isUserRole;
     final isReceived = !isMe;
+    final bool showHeader = isReceived && (isAI || isLawyerScale);
 
     Color? getBackgroundColor() {
       if (isMe) return AppColors.surfaceLight;
@@ -54,13 +80,6 @@ class ChatBubble extends StatelessWidget {
       return const Color(0xFFE2E8F0);
     }
 
-    // Header Logic
-    // Only show header if it's received AND (it's AI OR it's Lawyer).
-    // If it's a User (Client) sending to Lawyer, maybe we show their name?
-    // For now, let's just show header for AI and Lawyer for consistency with previous designs.
-    // If we are Lawyer viewing Client message, we might want to hide header or show "Client Name".
-    bool showHeader = isReceived && (isAI || isLawyerScale);
-
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -90,6 +109,7 @@ class ChatBubble extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Header (AI / Lawyer label) ────────────────────────────────────
             if (showHeader) ...[
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -108,7 +128,7 @@ class ChatBubble extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    isAI ? "Legal AI" : "Adv. Sarah Jenkins",
+                    isAI ? 'Legal AI' : 'Adv. Sarah Jenkins',
                     style: GoogleFonts.sora(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -119,15 +139,93 @@ class ChatBubble extends StatelessWidget {
               ),
               const SizedBox(height: 8),
             ],
-            Text(
-              message.content,
-              style: GoogleFonts.sora(
-                fontSize: 15,
-                height: 1.5,
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.w400,
+
+            // ── Loading spinner ───────────────────────────────────────────────
+            if (message.isLoading)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: isAI ? AppColors.primary : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    isAI ? 'Thinking...' : 'Processing audio...',
+                    style: GoogleFonts.sora(
+                      fontSize: 14,
+                      color: AppColors.textSecondaryLight,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              )
+            else ...[
+              // ── Message content ─────────────────────────────────────────────
+              Text(
+                message.content,
+                style: GoogleFonts.sora(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
+
+              // ── Audio playback button (voice responses only) ────────────────
+              if (message.audioUrl != null) ...[
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () => _toggleAudio(message.audioUrl!),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.4),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _isPlaying
+                              ? Icons.stop_circle_rounded
+                              : Icons.play_circle_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _isPlaying ? 'Stop Audio' : '▶ Play Audio Response',
+                          style: GoogleFonts.sora(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ],
         ),
       ),

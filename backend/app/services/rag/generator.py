@@ -1,19 +1,31 @@
 import requests
 
+
 class Generator:
     def __init__(self, model="mistral"):
         self.model = model
 
-    def generate(self, query, context):
+    def generate(self, question, context):
         prompt = f"""
-You are a legal assistant.
-Use ONLY the provided context to answer.
+You are an Indian legal assistant AI.
 
-Context:
+Use ONLY the provided legal context to answer the question.
+
+If relevant legal information is found:
+- Summarize clearly.
+- Mention relevant case names or legal provisions.
+- Keep the answer structured and professional.
+
+If information is NOT found in context:
+- Clearly state that it is not available in the retrieved documents.
+- Do NOT hallucinate.
+- Suggest consulting a lawyer if appropriate.
+
+Legal Context:
 {context}
 
 Question:
-{query}
+{question}
 
 Answer:
 """
