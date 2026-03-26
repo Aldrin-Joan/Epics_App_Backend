@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_1/l10n/app_localizations.dart';
 import 'package:flutter_application_1/providers/chat_controller.dart';
-import 'package:flutter_application_1/widgets/chat_bubble.dart';
-import 'package:flutter_application_1/theme/app_colors.dart';
+import 'package:flutter_application_1/models/chat_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -73,7 +71,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
 
   // ── Voice recording ────────────────────────────────────────────────────────
   Future<void> _startRecording() async {
-    // Request mic permission
     final status = await Permission.microphone.request();
     if (!status.isGranted) {
       if (mounted) {
@@ -117,42 +114,21 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
   // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final messages = ref.watch(chatProvider);
 
-    // Scroll to bottom on new messages
     _scrollToBottom();
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: const Color(0xFF0B0C0F),
       appBar: AppBar(
-        title: Text(
-          l10n.aiChat,
-          style: GoogleFonts.sora(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimaryLight,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: AppColors.textPrimaryLight,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          'Lawgix',
+          style: GoogleFonts.sora(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
@@ -182,7 +158,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // ── Mic Button ─────────────────────────────────────────────────
                 GestureDetector(
                   onTap: _isRecording ? _stopRecordingAndSend : _startRecording,
                   child: AnimatedBuilder(
@@ -228,8 +203,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-
-                // ── Text input ─────────────────────────────────────────────────
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
@@ -269,8 +242,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen>
                   ),
                 ),
                 const SizedBox(width: 12),
-
-                // ── Send Button ────────────────────────────────────────────────
                 GestureDetector(
                   onTap: _isRecording ? null : _send,
                   child: AnimatedOpacity(

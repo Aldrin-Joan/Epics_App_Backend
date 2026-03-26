@@ -40,170 +40,157 @@ class _UploadScreenState extends State<UploadScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: Text(
-          "Review Contract",
-          style: GoogleFonts.sora(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimaryLight,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: AppColors.textPrimaryLight,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
+@override
+Widget build(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+
+  return Scaffold(
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
+    appBar: AppBar(
+      title: Text(
+        "Review Contract",
+        style: GoogleFonts.sora(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Upload Area
-            GestureDetector(
-              onTap: _pickFile,
-              child: Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
-                    width: 2,
-                  ), // TODO: Dashed border ideally
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.cloud_upload_rounded,
-                        size: 32,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _fileName ?? "Click to upload or drag and drop",
-                      style: GoogleFonts.sora(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimaryLight,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "PDF, DOCX, TXT up to 10MB",
-                      style: GoogleFonts.sora(
-                        fontSize: 14,
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      centerTitle: true,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+        onPressed: () => Navigator.pop(context),
+      ),
+    ),
 
-            const SizedBox(height: 32),
-
-            // Analyze Button
-            SizedBox(
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 📤 MODERN UPLOAD CARD
+          GestureDetector(
+            onTap: _pickFile,
+            child: Container(
               width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _fileName != null && !_uploading
-                    ? _analyzeDocument
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.surfaceDark
+                    : AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.25),
                 ),
-                child: Ink(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryLight],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      shape: BoxShape.circle,
                     ),
-                    borderRadius: BorderRadius.circular(16),
+                    child: const Icon(
+                      Icons.upload_rounded,
+                      size: 28,
+                      color: AppColors.primary,
+                    ),
                   ),
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: _uploading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            "Analyze Document",
-                            style: GoogleFonts.sora(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+
+                  const SizedBox(height: 16),
+
+                  Text(
+                    _fileName ?? "Upload your document",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.sora(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+
+                  const SizedBox(height: 6),
+
+                  Text(
+                    "PDF, DOCX, TXT • Max 10MB",
+                    style: GoogleFonts.sora(
+                      fontSize: 12,
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          /// 🔍 ANALYZE BUTTON (CLEAN)
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed:
+                  _fileName != null && !_uploading ? _analyzeDocument : null,
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
+              child: _uploading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      "Analyze Document",
+                      style: GoogleFonts.sora(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
+          ),
 
-            const SizedBox(height: 32),
+          const SizedBox(height: 30),
 
-            // Recent Files
-            Text(
-              "Recent Files",
-              style: GoogleFonts.sora(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimaryLight,
-              ),
+          /// 📂 HEADER
+          Text(
+            "Recent Files",
+            style: GoogleFonts.sora(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 16),
+          ),
 
-            _buildRecentFileItem(
-              "Employment_Contract_v1.pdf",
-              "2 hours ago",
-              true,
-            ),
-            _buildRecentFileItem("NDA_Draft_Final.docx", "Yesterday", false),
-            _buildRecentFileItem("Lease_Agreement_2024.pdf", "Oct 24", true),
-          ],
-        ),
+          const SizedBox(height: 14),
+
+          _buildRecentFileItem(
+            "Employment_Contract_v1.pdf",
+            "2 hours ago",
+            true,
+          ),
+          _buildRecentFileItem("NDA_Draft_Final.docx", "Yesterday", false),
+          _buildRecentFileItem("Lease_Agreement_2024.pdf", "Oct 24", true),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildRecentFileItem(String name, String date, bool isPdf) {
     return Container(

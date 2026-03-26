@@ -19,11 +19,14 @@ class _FindLawyersScreenState extends State<FindLawyersScreen> {
     "Civil",
     "Corporate",
   ];
+
   String _selectedFilter = "All";
   final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final lawyers = List.generate(
       6,
       (i) => Lawyer(
@@ -33,137 +36,98 @@ class _FindLawyersScreenState extends State<FindLawyersScreen> {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
       appBar: AppBar(
         title: Text(
           "Find Experts",
-          style: GoogleFonts.sora(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimaryLight,
-          ),
+          style: GoogleFonts.sora(fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: AppColors.textPrimaryLight,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-        ),
       ),
+
       body: Column(
         children: [
-          // Search and Filter Section
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(color: AppColors.backgroundLight),
+          /// 🔍 SEARCH + FILTER
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
             child: Column(
               children: [
-                // Search Bar
+                /// 🔎 SEARCH BAR (UPGRADED)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: isDark
+                        ? AppColors.surfaceDark
+                        : AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
                     ],
                   ),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.search,
-                        color: AppColors.textSecondaryLight,
-                      ),
-                      const SizedBox(width: 12),
+                      const Icon(Icons.search, size: 20),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
+                          style: GoogleFonts.sora(fontSize: 13),
                           decoration: InputDecoration(
                             hintText: "Search lawyers...",
-                            hintStyle: GoogleFonts.sora(
-                              color: AppColors.textSecondaryLight,
-                              fontSize: 14,
-                            ),
+                            hintStyle: GoogleFonts.sora(fontSize: 13),
                             border: InputBorder.none,
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.tune_rounded,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
-                      ),
+                      const Icon(Icons.tune, size: 18),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
 
-                // Filter Chips
+                const SizedBox(height: 14),
+
+                /// 🎯 FILTER CHIPS (MODERN)
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: _filters.map((filter) {
                       final isSelected = _selectedFilter == filter;
+
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(
-                            filter,
-                            style: GoogleFonts.sora(
-                              fontSize: 13,
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.textSecondaryLight,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                          ),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() => _selectedFilter = filter);
-                          },
-                          backgroundColor: AppColors.surfaceLight,
-                          selectedColor: AppColors.primary,
-                          checkmarkColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _selectedFilter = filter),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 9),
+                            decoration: BoxDecoration(
                               color: isSelected
                                   ? AppColors.primary
-                                  : const Color(0xFFE2E8F0),
+                                  : (isDark
+                                      ? AppColors.surfaceDark
+                                      : AppColors.surfaceLight),
+                              borderRadius: BorderRadius.circular(22),
                             ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                            child: Text(
+                              filter,
+                              style: GoogleFonts.sora(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textSecondaryLight,
+                              ),
+                            ),
                           ),
                         ),
                       );
@@ -174,12 +138,12 @@ class _FindLawyersScreenState extends State<FindLawyersScreen> {
             ),
           ),
 
-          // Lawyer List
+          /// 📋 LAWYER LIST
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: lawyers.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              separatorBuilder: (_, _) => const SizedBox(height: 14),
               itemBuilder: (context, index) {
                 final lawyer = lawyers[index];
                 return _LawyerCard(lawyer: lawyer);
@@ -199,38 +163,46 @@ class _LawyerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: isDark
+            ? AppColors.surfaceDark
+            : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
+
       child: Column(
         children: [
+          /// TOP SECTION
           Row(
             children: [
+              /// AVATAR
               Container(
-                width: 60,
-                height: 60,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                   image: const DecorationImage(
-                    image: NetworkImage(
-                      "https://i.pravatar.cc/150?img=5",
-                    ), // Placeholder
+                    image:
+                        NetworkImage("https://i.pravatar.cc/150?img=5"),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+
+              const SizedBox(width: 12),
+
+              /// INFO
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,43 +210,38 @@ class _LawyerCard extends StatelessWidget {
                     Text(
                       lawyer.name,
                       style: GoogleFonts.sora(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimaryLight,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                       lawyer.specialization,
                       style: GoogleFonts.sora(
-                        fontSize: 13,
+                        fontSize: 12,
                         color: AppColors.textSecondaryLight,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
+
+                    /// ⭐ RATING
                     Row(
                       children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          color: AppColors.warning,
-                          size: 16,
-                        ),
+                        const Icon(Icons.star,
+                            size: 14, color: AppColors.warning),
                         const SizedBox(width: 4),
                         Text(
                           "4.9",
                           style: GoogleFonts.sora(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimaryLight,
-                          ),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          "(128 reviews)",
+                          "(128)",
                           style: GoogleFonts.sora(
-                            fontSize: 12,
-                            color: AppColors.textSecondaryLight,
-                          ),
+                              fontSize: 11,
+                              color: AppColors.textSecondaryLight),
                         ),
                       ],
                     ),
@@ -283,38 +250,27 @@ class _LawyerCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 14),
+
+          /// BUTTON
           SizedBox(
             width: double.infinity,
-            height: 44,
+            height: 42,
             child: ElevatedButton(
-              onPressed: () {
-                context.push('/lawyer-chat'); // Points to Lawyer chat demo
-              },
+              onPressed: () => context.push('/lawyer-chat'),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
+                elevation: 0,
+                backgroundColor: AppColors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 0,
               ),
-              child: Ink(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryLight],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Book Consultation",
-                    style: GoogleFonts.sora(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+              child: Text(
+                "Consult",
+                style: GoogleFonts.sora(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),

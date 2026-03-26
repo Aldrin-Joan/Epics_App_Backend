@@ -6,159 +6,183 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/theme/app_colors.dart';
 import 'package:flutter_application_1/providers/client_nav_provider.dart';
 import 'package:flutter_application_1/widgets/dashboard_widgets.dart';
+import 'package:flutter_application_1/screens/ai_chat_screen.dart';
+import 'package:flutter_application_1/screens/profile_screen.dart';
+import 'package:flutter_application_1/screens/my_cases_screen.dart';
 
 class ClientDashboard extends ConsumerWidget {
   const ClientDashboard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
     final navIndex = ref.watch(clientNavIndexProvider);
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: _buildScreen(navIndex, context, ref),
+      ),
+      bottomNavigationBar: _bottomNav(ref, navIndex),
+    );
+  }
+
+  /// 🔁 Screen Switcher
+  Widget _buildScreen(int index, BuildContext context, WidgetRef ref) {
+    switch (index) {
+      case 1:
+        return const AIChatScreen();
+      case 2:
+        return const ProfileScreen();
+      case 3:
+        return const MyCasesScreen(); // ✅ NEW
+      default:
+        return _homeScreen(context, ref);
+    }
+  }
+
+  /// 🏠 HOME SCREEN (YOUR EXISTING UI)
+  Widget _homeScreen(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+
+          /// 🌤 Greeting
+          Text(
+            "Good Morning,",
+            style: GoogleFonts.sora(
+              fontSize: 16,
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// ⭐ Action Grid
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 18,
+            mainAxisSpacing: 18,
+            childAspectRatio: 0.95,
             children: [
-              // Greeting Section
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Good Morning,", // TODO: l10n
-                      style: GoogleFonts.sora(
-                        fontSize: 18,
-                        color: AppColors.textSecondaryLight,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Alex Johnson", // TODO: data from user provider
-                      style: GoogleFonts.sora(
-                        fontSize: 28,
-                        color: AppColors.textPrimaryLight,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+              ActionCard(
+                title: l10n.aiChat,
+                subtitle: "Ask legal questions",
+                icon: Icons.auto_awesome_rounded,
+                color: ActionCardColor.purple,
+                onTap: () {
+                  ref.read(clientNavIndexProvider.notifier).setIndex(1);
+                },
               ),
-
-              const SizedBox(height: 32),
-
-              // Action Cards Grid
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.85,
-                  children: [
-                    ActionCard(
-                      title: l10n.aiChat,
-                      subtitle: "Ask legal questions",
-                      icon: Icons.chat_bubble_outline_rounded,
-                      color: ActionCardColor.purple,
-                      onTap: () => context.push('/ai-chat'),
-                    ),
-                    ActionCard(
-                      title: l10n.uploadDocs,
-                      subtitle: "Review contracts",
-                      icon: Icons.upload_file_rounded,
-                      color: ActionCardColor.green,
-                      onTap: () => context.push('/upload'),
-                    ),
-                    ActionCard(
-                      title: l10n.findLawyers,
-                      subtitle: "Expert consultation",
-                      icon: Icons.gavel_rounded,
-                      color: ActionCardColor.amber,
-                      onTap: () => context.push('/find-lawyers'),
-                    ),
-                    ActionCard(
-                      title: "My Cases", // TODO: l10n
-                      subtitle: "Track progress",
-                      icon: Icons.folder_open_rounded,
-                      color: ActionCardColor.purple, // Reusing purple
-                      onTap: () {}, // TODO: Implement My Cases
-                    ),
-                  ],
-                ),
+              ActionCard(
+                title: l10n.uploadDocs,
+                subtitle: "Review contracts",
+                icon: Icons.upload_file_rounded,
+                color: ActionCardColor.green,
+                onTap: () => context.push('/upload'),
               ),
-
-              const SizedBox(height: 32),
-
-              // Recent Consultations Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  l10n.recentConsultations,
-                  style: GoogleFonts.sora(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimaryLight,
-                  ),
-                ),
+              ActionCard(
+                title: l10n.findLawyers,
+                subtitle: "Expert consultation",
+                icon: Icons.gavel_rounded,
+                color: ActionCardColor.amber,
+                onTap: () => context.push('/find-lawyers'),
               ),
-
-              const SizedBox(height: 16),
-
-              // Consultations List
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 3,
-                  itemBuilder: (context, index) {
-                    // specific data for demo
-                    final titles = [
-                      "Property Dispute",
-                      "Contract Review",
-                      "Family Law Inquiry",
-                    ];
-                    final dates = ["2 hours ago", "Yesterday", "Oct 24"];
-                    final statuses = ["In Progress", "Completed", "Pending"];
-
-                    return ConsultationItem(
-                      title: titles[index],
-                      date: dates[index],
-                      status: statuses[index],
-                      onTap: () {},
-                    );
-                  },
-                ),
+              ActionCard(
+                title: "My Cases",
+                subtitle: "Track progress",
+                icon: Icons.folder_open_rounded,
+                color: ActionCardColor.purple,
+                onTap: () {
+                  ref.read(clientNavIndexProvider.notifier).setIndex(3);
+                },
               ),
-
-              const SizedBox(height: 100), // Bottom padding for nav bar
             ],
           ),
-        ),
-      ),
 
-      // Custom Bottom Navigation
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
-          border: Border(
-            top: BorderSide(color: AppColors.backgroundLight, width: 2),
+          const SizedBox(height: 24),
+
+          /// 🧾 Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.recentConsultations,
+                style: GoogleFonts.sora(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                "See all",
+                style: GoogleFonts.sora(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
           ),
+
+          const SizedBox(height: 12),
+
+          /// 📋 List
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            separatorBuilder: (_, _) => const SizedBox(height: 14),
+            itemBuilder: (context, index) {
+              final titles = [
+                "Property Dispute",
+                "Contract Review",
+                "Family Law Inquiry",
+              ];
+              final dates = ["2 hours ago", "Yesterday", "Oct 24"];
+              final statuses = [
+                "In Progress",
+                "Completed",
+                "Pending"
+              ];
+
+              return ConsultationItem(
+                title: titles[index],
+                date: dates[index],
+                status: statuses[index],
+                onTap: () {},
+              );
+            },
+          ),
+
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+
+  /// 🌊 Bottom Navigation
+  Widget _bottomNav(WidgetRef ref, int navIndex) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        padding: const EdgeInsets.only(bottom: 20, top: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -168,7 +192,6 @@ class ClientDashboard extends ConsumerWidget {
               isActive: navIndex == 0,
               onTap: () {
                 ref.read(clientNavIndexProvider.notifier).setIndex(0);
-                // Stay here
               },
             ),
             _NavItem(
@@ -177,7 +200,14 @@ class ClientDashboard extends ConsumerWidget {
               isActive: navIndex == 1,
               onTap: () {
                 ref.read(clientNavIndexProvider.notifier).setIndex(1);
-                context.push('/ai-chat');
+              },
+            ),
+            _NavItem(
+              icon: Icons.folder_open_rounded,
+              label: "Cases",
+              isActive: navIndex == 3,
+              onTap: () {
+                ref.read(clientNavIndexProvider.notifier).setIndex(3);
               },
             ),
             _NavItem(
@@ -186,7 +216,6 @@ class ClientDashboard extends ConsumerWidget {
               isActive: navIndex == 2,
               onTap: () {
                 ref.read(clientNavIndexProvider.notifier).setIndex(2);
-                context.push('/profile');
               },
             ),
           ],
@@ -211,39 +240,42 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? AppColors.primary : AppColors.textSecondaryLight,
-            size: 26,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.sora(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppColors.primary.withOpacity(0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 24,
               color: isActive
                   ? AppColors.primary
-                  : AppColors.textSecondaryLight,
+                  : theme.colorScheme.onSurface,
             ),
-          ),
-          if (isActive)
-            Container(
-              margin: const EdgeInsets.only(top: 4),
-              width: 20,
-              height: 3,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(2),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.sora(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: isActive
+                    ? AppColors.primary
+                    : theme.colorScheme.onSurface.withOpacity(0.9),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

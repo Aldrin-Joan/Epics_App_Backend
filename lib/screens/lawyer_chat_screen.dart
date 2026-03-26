@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_application_1/widgets/chat_bubble.dart';
 import 'package:flutter_application_1/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/models/chat_message.dart';
 
-// Using Notifier instead of StateProvider for consistency
+/// ✅ NOTIFIER
 class LawyerChatNotifier extends Notifier<List<ChatMessage>> {
   @override
   List<ChatMessage> build() {
@@ -22,41 +21,42 @@ class LawyerChatNotifier extends Notifier<List<ChatMessage>> {
   }
 }
 
+/// ✅ PROVIDER
 final lawyerChatProvider =
     NotifierProvider<LawyerChatNotifier, List<ChatMessage>>(
-      LawyerChatNotifier.new,
-    );
+  LawyerChatNotifier.new,
+);
 
+/// ✅ SCREEN
 class LawyerChatScreen extends ConsumerStatefulWidget {
   const LawyerChatScreen({super.key});
 
   @override
-  ConsumerState<LawyerChatScreen> createState() => _LawyerChatScreenState();
+  ConsumerState<LawyerChatScreen> createState() =>
+      _LawyerChatScreenState();
 }
 
-class _LawyerChatScreenState extends ConsumerState<LawyerChatScreen> {
+class _LawyerChatScreenState
+    extends ConsumerState<LawyerChatScreen> {
   final TextEditingController _controller = TextEditingController();
 
   void _send() {
     if (_controller.text.trim().isEmpty) return;
 
-    final messageText = _controller.text;
+    final text = _controller.text;
     _controller.clear();
 
-    // Add user message via notifier
-    ref
-        .read(lawyerChatProvider.notifier)
-        .addMessage(ChatMessage(content: messageText, role: ChatRole.user));
+    ref.read(lawyerChatProvider.notifier).addMessage(
+          ChatMessage(content: text, role: ChatRole.user),
+        );
 
-    // Simulate lawyer response
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (!mounted) return;
-      ref
-          .read(lawyerChatProvider.notifier)
-          .addMessage(
+
+      ref.read(lawyerChatProvider.notifier).addMessage(
             const ChatMessage(
               content:
-                  "I see. Could you provide more details about the contract?",
+                  "I understand. Can you share more details about your case?",
               role: ChatRole.lawyer,
             ),
           );
@@ -66,148 +66,175 @@ class _LawyerChatScreenState extends ConsumerState<LawyerChatScreen> {
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(lawyerChatProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
+      /// 🔥 APPBAR
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Column(
           children: [
             Text(
-              "Adv. Sarah Jenkins",
+              "Lawgix AI",
               style: GoogleFonts.sora(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimaryLight,
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? Colors.white
+                    : AppColors.textPrimaryLight,
               ),
             ),
             Text(
-              "online",
+              "Legal Assistant",
               style: GoogleFonts.sora(
                 fontSize: 12,
-                color: AppColors.accent,
-                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondaryLight,
               ),
             ),
           ],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: AppColors.textPrimaryLight,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.call_rounded, color: AppColors.primary),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.videocam_rounded, color: AppColors.primary),
-          ),
-        ],
       ),
+
       body: Column(
         children: [
+          /// 💬 CHAT AREA
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return ChatBubble(message: messages[index]);
-              },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
-              border: const Border(
-                top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).scaffoldBackgroundColor,
+                    AppColors.primary.withOpacity(0.05),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE2E8F0),
-                        width: 2,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final msg = messages[index];
+                  final isUser = msg.role == ChatRole.user;
+
+                  return Align(
+                    alignment: isUser
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(14),
+                      constraints:
+                          const BoxConstraints(maxWidth: 280),
+                      decoration: BoxDecoration(
+                        color: isUser
+                            ? AppColors.primary
+                            : (isDark
+                                ? const Color(0xFF1E293B)
+                                : Colors.white),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isUser
+                                ? AppColors.primary.withOpacity(0.3)
+                                : Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        msg.content,
+                        style: GoogleFonts.sora(
+                          fontSize: 15,
+                          height: 1.4,
+                          color: isUser
+                              ? Colors.white
+                              : (isDark
+                                  ? Colors.white
+                                  : AppColors.textPrimaryLight),
+                        ),
                       ),
                     ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          /// ✨ INPUT BAR
+          Container(
+            padding:
+                const EdgeInsets.fromLTRB(16, 10, 16, 16),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF0F172A)
+                    : Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 12,
+                  )
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.add, size: 20),
+
+                  const SizedBox(width: 8),
+
+                  Expanded(
                     child: TextField(
                       controller: _controller,
-                      style: GoogleFonts.sora(fontSize: 15),
+                      style: GoogleFonts.sora(
+                        fontSize: 15,
+                        color: isDark
+                            ? Colors.white
+                            : AppColors.textPrimaryLight,
+                      ),
                       decoration: InputDecoration(
-                        hintText: "Type a message...",
+                        hintText: "Ask Lawgix anything...",
                         hintStyle: GoogleFonts.sora(
-                          color: AppColors.textSecondaryLight,
                           fontSize: 14,
+                          color: Colors.grey.shade500,
                         ),
                         border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        filled: false,
                       ),
                       onSubmitted: (_) => _send(),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
+
+                  const Icon(Icons.mic_none, size: 20),
+
+                  const SizedBox(width: 8),
+
+                  GestureDetector(
                     onTap: _send,
-                    borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      width: 48,
-                      height: 48,
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryLight],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(
-                        Icons.send_rounded,
+                        Icons.send,
+                        size: 16,
                         color: Colors.white,
-                        size: 20,
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
