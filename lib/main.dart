@@ -79,13 +79,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/personal-info',
         builder: (_, __) => const PersonalInfoScreen(),
       ),
-      GoRoute(path: '/security', builder: (_, __) => const SecurityScreen()),
-      GoRoute(path: '/payments', builder: (_, __) => const PaymentScreen()),
-      GoRoute(
-        path: '/notifications',
-        builder: (_, __) => const NotificationScreen(),
-      ),
-      GoRoute(path: '/help', builder: (_, __) => const HelpScreen()),
+GoRoute(
+  path: '/personal-info',
+  builder: (_, __) => const PersonalInfoScreen(),
+),
+
+GoRoute(path: '/security', builder: (_, __) => const SecurityScreen()),
+GoRoute(path: '/payments', builder: (_, __) => const PaymentScreen()),
+GoRoute(
+  path: '/notifications',
+  builder: (_, __) => const NotificationScreen(),
+),
+GoRoute(path: '/help', builder: (_, __) => const HelpScreen()),
     ],
   );
 });

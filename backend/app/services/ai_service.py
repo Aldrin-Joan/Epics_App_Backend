@@ -1,26 +1,40 @@
 import asyncio
-import random
+from app.services.rag.rag_service import RAGService
+from app.services.translation_service import TranslationService
+
+
+rag_service = RAGService()
+translator = TranslationService()
 
 
 class AIService:
+
     @staticmethod
     async def get_legal_advice(query: str) -> str:
-        # Placeholder for LLM integration
-        responses = [
-            "Based on your query, you might need to look into Section 402 of the Legal Code. This is a placeholder response.",
-            "I've analyzed your case details. It seems like a contractual dispute. Can you provide more details?",
-            "As an AI legal assistant, I recommend consulting with a lawyer for this specific issue. However, here's some general info...",
-            "Your case involves property rights. Have you checked the latest amendments to the Property Act?",
-        ]
-        await asyncio.sleep(1)  # Simulate network/processing lag
-        return random.choice(responses)
+        # Step 1: Detect language
+        source_lang = translator.detect_language(query)
+
+        # Step 2: Translate to English if needed
+        if source_lang != "en":
+            query_en = translator.translate(query, source_lang, "en")
+        else:
+            query_en = query
+
+        # Step 3: Run RAG in background thread (blocking call)
+        answer_en = await asyncio.to_thread(rag_service.query, query_en)
+
+        # Step 4: Translate answer back to original language
+        if source_lang != "en":
+            final_answer = translator.translate(answer_en, "en", source_lang)
+        else:
+            final_answer = answer_en
+
+        return final_answer
 
     @staticmethod
     async def text_to_speech_placeholder(text: str) -> str:
-        # Placeholder for TTS logic - returns a fake audio URL
-        return f"https://api.legaltech.app/v1/tts/sample_output_{random.randint(100, 999)}.mp3"
+        return "TTS not implemented yet"
 
     @staticmethod
     async def speech_to_text_placeholder(audio_data: bytes) -> str:
-        # Placeholder for STT logic
-        return "This is a placeholder for transcribed text from your voice query."
+        return "STT not implemented yet"

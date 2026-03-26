@@ -56,7 +56,7 @@ class ClientDashboard extends ConsumerWidget {
             "Good Morning,",
             style: GoogleFonts.sora(
               fontSize: 16,
-              color: theme.colorScheme.onBackground.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
 
@@ -137,7 +137,7 @@ class ClientDashboard extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 3,
-            separatorBuilder: (_, __) => const SizedBox(height: 14),
+            separatorBuilder: (_, _) => const SizedBox(height: 14),
             itemBuilder: (context, index) {
               final titles = [
                 "Property Dispute",
@@ -271,7 +271,7 @@ class _NavItem extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: isActive
                     ? AppColors.primary
-                    : theme.colorScheme.onBackground.withOpacity(0.9),
+                    : theme.colorScheme.onSurface.withOpacity(0.9),
               ),
             ),
           ],

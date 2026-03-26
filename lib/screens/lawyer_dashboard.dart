@@ -299,12 +299,14 @@ class FeedCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 20,
-                child: Icon(Icons.person, size: 18),
-              ),
+         
+Row(
+  children: [
+    const CircleAvatar(
+      radius: 20,
+      child: Icon(Icons.person, size: 18),
+    ),
+    
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
