@@ -143,7 +143,7 @@ class _FindLawyersScreenState extends State<FindLawyersScreen> {
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: lawyers.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 14),
+              separatorBuilder: (_, __) => const SizedBox(height: 14),
               itemBuilder: (context, index) {
                 final lawyer = lawyers[index];
                 return _LawyerCard(lawyer: lawyer);

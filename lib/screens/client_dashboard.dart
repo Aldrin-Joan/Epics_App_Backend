@@ -1,3 +1,4 @@
+import 'dart:ui'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_application_1/l10n/app_localizations.dart';
@@ -21,11 +22,10 @@ class ClientDashboard extends ConsumerWidget {
       body: SafeArea(
         child: _buildScreen(navIndex, context, ref),
       ),
-      bottomNavigationBar: _bottomNav(ref, navIndex),
+      bottomNavigationBar: _bottomNav(ref, navIndex), // ✅ updated UI
     );
   }
 
-  /// 🔁 Screen Switcher
   Widget _buildScreen(int index, BuildContext context, WidgetRef ref) {
     switch (index) {
       case 1:
@@ -33,13 +33,12 @@ class ClientDashboard extends ConsumerWidget {
       case 2:
         return const ProfileScreen();
       case 3:
-        return const MyCasesScreen(); // ✅ NEW
+        return const MyCasesScreen();
       default:
         return _homeScreen(context, ref);
     }
   }
 
-  /// 🏠 HOME SCREEN (YOUR EXISTING UI)
   Widget _homeScreen(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -51,18 +50,16 @@ class ClientDashboard extends ConsumerWidget {
         children: [
           const SizedBox(height: 24),
 
-          /// 🌤 Greeting
           Text(
             "Good Morning,",
             style: GoogleFonts.sora(
               fontSize: 16,
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onBackground.withOpacity(0.6),
             ),
           ),
 
           const SizedBox(height: 16),
 
-          /// ⭐ Action Grid
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -108,7 +105,6 @@ class ClientDashboard extends ConsumerWidget {
 
           const SizedBox(height: 24),
 
-          /// 🧾 Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -132,12 +128,11 @@ class ClientDashboard extends ConsumerWidget {
 
           const SizedBox(height: 12),
 
-          /// 📋 List
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 3,
-            separatorBuilder: (_, _) => const SizedBox(height: 14),
+            separatorBuilder: (_, __) => const SizedBox(height: 14),
             itemBuilder: (context, index) {
               final titles = [
                 "Property Dispute",
@@ -166,65 +161,69 @@ class ClientDashboard extends ConsumerWidget {
     );
   }
 
-  /// 🌊 Bottom Navigation
+  /// 🌊 UPDATED PREMIUM BOTTOM NAV
   Widget _bottomNav(WidgetRef ref, int navIndex) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 25,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavItem(
-              icon: Icons.dashboard_rounded,
-              label: "Home",
-              isActive: navIndex == 0,
-              onTap: () {
-                ref.read(clientNavIndexProvider.notifier).setIndex(0);
-              },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavItem(
+                  icon: Icons.dashboard_rounded,
+                  label: "Home",
+                  isActive: navIndex == 0,
+                  onTap: () =>
+                      ref.read(clientNavIndexProvider.notifier).setIndex(0),
+                ),
+                _NavItem(
+                  icon: Icons.chat_bubble_rounded,
+                  label: "Chat",
+                  isActive: navIndex == 1,
+                  onTap: () =>
+                      ref.read(clientNavIndexProvider.notifier).setIndex(1),
+                ),
+                _NavItem(
+                  icon: Icons.folder_open_rounded,
+                  label: "Cases",
+                  isActive: navIndex == 3,
+                  onTap: () =>
+                      ref.read(clientNavIndexProvider.notifier).setIndex(3),
+                ),
+                _NavItem(
+                  icon: Icons.person_rounded,
+                  label: "Profile",
+                  isActive: navIndex == 2,
+                  onTap: () =>
+                      ref.read(clientNavIndexProvider.notifier).setIndex(2),
+                ),
+              ],
             ),
-            _NavItem(
-              icon: Icons.chat_bubble_rounded,
-              label: "Chat",
-              isActive: navIndex == 1,
-              onTap: () {
-                ref.read(clientNavIndexProvider.notifier).setIndex(1);
-              },
-            ),
-            _NavItem(
-              icon: Icons.folder_open_rounded,
-              label: "Cases",
-              isActive: navIndex == 3,
-              onTap: () {
-                ref.read(clientNavIndexProvider.notifier).setIndex(3);
-              },
-            ),
-            _NavItem(
-              icon: Icons.person_rounded,
-              label: "Profile",
-              isActive: navIndex == 2,
-              onTap: () {
-                ref.read(clientNavIndexProvider.notifier).setIndex(2);
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// 🔹 UPDATED NAV ITEM (visibility fixed)
 class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -240,18 +239,16 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? AppColors.primary.withOpacity(0.12)
+              ? AppColors.primary.withOpacity(0.15)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -261,7 +258,7 @@ class _NavItem extends StatelessWidget {
               size: 24,
               color: isActive
                   ? AppColors.primary
-                  : theme.colorScheme.onSurface,
+                  : Colors.grey.shade600, // ✅ fixed
             ),
             const SizedBox(height: 4),
             Text(
@@ -271,7 +268,7 @@ class _NavItem extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: isActive
                     ? AppColors.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.9),
+                    : Colors.grey.shade600, // ✅ fixed
               ),
             ),
           ],

@@ -60,7 +60,7 @@ class LawyerProfileScreen extends StatelessWidget {
                       _stat("4.8", "Rating"),
                       _stat("5 yrs", "Experience"),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -84,7 +84,8 @@ class LawyerProfileScreen extends StatelessWidget {
                   context: context,
                   builder: (dialogContext) => AlertDialog(
                     title: const Text("Logout"),
-                    content: const Text("Are you sure you want to logout?"),
+                    content:
+                        const Text("Are you sure you want to logout?"),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(dialogContext),
@@ -142,7 +143,10 @@ class LawyerProfileScreen extends StatelessWidget {
         ),
         Text(
           label,
-          style: GoogleFonts.sora(color: Colors.white70, fontSize: 11),
+          style: GoogleFonts.sora(
+            color: Colors.white70,
+            fontSize: 11,
+          ),
         ),
       ],
     );
@@ -150,43 +154,25 @@ class LawyerProfileScreen extends StatelessWidget {
 
   /// ⚙️ TILE
   Widget _tile(BuildContext context, String title, IconData icon) {
-    return GestureDetector(
-      onTap: () {
-        if (title == "Edit Profile") {
-          context.push('/edit-profile');
-        } else if (title == "My Clients") {
-          context.push('/my-clients');
-        } else if (title == "Set Availability") {
-          context.push('/lawyer-availability');
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white, // ✅ better contrast
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primary),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.sora(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black, // ✅ FIX VISIBILITY
-                ),
-              ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.sora(fontSize: 14),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16),
-          ],
-        ),
+          ),
+          const Icon(Icons.arrow_forward_ios, size: 16),
+        ],
       ),
     );
   }

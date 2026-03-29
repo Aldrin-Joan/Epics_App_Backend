@@ -1,13 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_application_1/providers/chat_controller.dart';
-import 'package:flutter_application_1/theme/app_colors.dart';
-import 'package:flutter_application_1/widgets/chat_bubble.dart';
+import 'package:flutter_application_1/models/chat_message.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:record/record.dart';
 
 class AIChatScreen extends ConsumerStatefulWidget {
   const AIChatScreen({super.key});
@@ -16,272 +11,228 @@ class AIChatScreen extends ConsumerStatefulWidget {
   ConsumerState<AIChatScreen> createState() => _AIChatScreenState();
 }
 
-class _AIChatScreenState extends ConsumerState<AIChatScreen>
-    with SingleTickerProviderStateMixin {
+class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  final AudioRecorder _recorder = AudioRecorder();
+  final ScrollController _scroll = ScrollController();
 
-  bool _isRecording = false;
-  String? _recordingPath;
+  void _send() {
+    if (_controller.text.trim().isEmpty) return;
+    ref.read(chatProvider.notifier).sendMessage(_controller.text);
+    _controller.clear();
 
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _scrollController.dispose();
-    _recorder.dispose();
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  // ── Auto-scroll to bottom when new messages arrive ─────────────────────────
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (_scroll.hasClients) {
+        _scroll.animateTo(
+          _scroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 400),
           curve: Curves.easeOut,
         );
       }
     });
   }
 
-  // ── Text send ──────────────────────────────────────────────────────────────
-  void _send() {
-    if (_controller.text.trim().isEmpty) return;
-    ref.read(chatProvider.notifier).sendTextMessage(_controller.text);
-    _controller.clear();
-    _scrollToBottom();
-  }
-
-  // ── Voice recording ────────────────────────────────────────────────────────
-  Future<void> _startRecording() async {
-    final status = await Permission.microphone.request();
-    if (!status.isGranted) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Microphone permission is required for voice queries.',
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      return;
-    }
-
-    final dir = await getTemporaryDirectory();
-    final path =
-        '${dir.path}/voice_query_${DateTime.now().millisecondsSinceEpoch}.m4a';
-
-    await _recorder.start(
-      const RecordConfig(encoder: AudioEncoder.aacLc, bitRate: 128000),
-      path: path,
-    );
-
-    setState(() {
-      _isRecording = true;
-      _recordingPath = path;
-    });
-  }
-
-  Future<void> _stopRecordingAndSend() async {
-    final path = await _recorder.stop();
-    setState(() => _isRecording = false);
-
-    if (path == null) return;
-    final audioFile = File(path);
-    if (!await audioFile.exists()) return;
-
-    ref.read(chatProvider.notifier).sendVoiceMessage(audioFile);
-    _scrollToBottom();
-  }
-
-  // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(chatProvider);
 
-    _scrollToBottom();
-
     return Scaffold(
       backgroundColor: const Color(0xFF0B0C0F),
+
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'Lawgix',
+          "Lawgix",
           style: GoogleFonts.sora(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
       ),
+
       body: Column(
         children: [
-          // ── Chat messages ───────────────────────────────────────────────────
+          /// Messages OR hero
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(20),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return ChatBubble(message: messages[index]);
-              },
-            ),
-          ),
-
-          // ── Input bar ───────────────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
-              border: const Border(
-                top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-              ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: _isRecording ? _stopRecordingAndSend : _startRecording,
-                  child: AnimatedBuilder(
-                    animation: _pulseAnimation,
-                    builder: (context, child) {
-                      final scale = _isRecording ? _pulseAnimation.value : 1.0;
-                      return Transform.scale(
-                        scale: scale,
-                        child: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: _isRecording
-                                ? Colors.red.shade50
-                                : AppColors.surfaceLight,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: _isRecording
-                                  ? Colors.red
-                                  : const Color(0xFFE2E8F0),
-                              width: 2,
-                            ),
-                            boxShadow: _isRecording
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.red.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      spreadRadius: 2,
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Icon(
-                            _isRecording
-                                ? Icons.stop_rounded
-                                : Icons.mic_rounded,
-                            color: _isRecording
-                                ? Colors.red
-                                : AppColors.textSecondaryLight,
-                            size: 22,
-                          ),
-                        ),
+            child: messages.isEmpty
+                ? _hero()
+                : ListView.builder(
+                    controller: _scroll,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
+                    itemCount: messages.length,
+                    itemBuilder: (context, i) {
+                      final msg = messages[i];
+                      return _bubble(
+                        msg.content,
+                        msg.role == ChatRole.user,
                       );
                     },
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE2E8F0),
-                        width: 2,
-                      ),
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      style: GoogleFonts.sora(fontSize: 15),
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        hintText: _isRecording
-                            ? '🔴 Recording... tap ■ to stop'
-                            : 'Ask a legal question...',
-                        hintStyle: GoogleFonts.sora(
-                          color: _isRecording
-                              ? Colors.red
-                              : AppColors.textSecondaryLight,
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        filled: false,
-                      ),
-                      onSubmitted: (_) => _send(),
-                      enabled: !_isRecording,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: _isRecording ? null : _send,
-                  child: AnimatedOpacity(
-                    opacity: _isRecording ? 0.4 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryLight],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.send_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          ),
+
+          /// bottom input only when chat started
+          if (messages.isNotEmpty) _inputBar(),
+        ],
+      ),
+    );
+  }
+
+  /// ⭐ HERO (Gemini style)
+  Widget _hero() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.auto_awesome,
+                size: 48, color: Color(0xFF7C9BFF)),
+            const SizedBox(height: 20),
+
+            Text(
+              "Meet Lawgix,\nyour legal AI assistant",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.sora(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            _heroInput(),
+
+            const SizedBox(height: 20),
+
+            _suggestionPills(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// ⭐ Large hero input
+  Widget _heroInput() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1F24),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.add, color: Colors.grey),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: "Ask Lawgix…",
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+              ),
+              onSubmitted: (_) => _send(),
             ),
           ),
+          IconButton(
+            icon: const Icon(Icons.send, color: Colors.grey),
+            onPressed: _send,
+          ),
         ],
+      ),
+    );
+  }
+
+  /// ⭐ Suggestion pills
+  Widget _suggestionPills() {
+    final items = [
+      "Contract review",
+      "Property dispute",
+      "Divorce process",
+      "Startup legal"
+    ];
+
+    return Wrap(
+      spacing: 10,
+      children: items.map((e) {
+        return GestureDetector(
+          onTap: () {
+            _controller.text = e;
+            _send();
+          },
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1F24),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child:
+                Text(e, style: const TextStyle(color: Colors.white70)),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// ⭐ Bubble
+  Widget _bubble(String text, bool isUser) {
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(14),
+        constraints: const BoxConstraints(maxWidth: 420),
+        decoration: BoxDecoration(
+          color: isUser
+              ? const Color(0xFF5B7FFF)
+              : const Color(0xFF1E1F24),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.sora(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  /// ⭐ Bottom input after chat starts
+  Widget _inputBar() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1F24),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.mic_none, color: Colors.grey),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: "Ask Lawgix…",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
+                ),
+                onSubmitted: (_) => _send(),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed: _send,
+            )
+          ],
+        ),
       ),
     );
   }
