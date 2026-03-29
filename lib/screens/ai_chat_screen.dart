@@ -17,7 +17,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
 
   void _send() {
     if (_controller.text.trim().isEmpty) return;
-    ref.read(chatProvider.notifier).sendMessage(_controller.text);
+    ref.read(chatProvider.notifier).sendTextMessage(_controller.text);
     _controller.clear();
 
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -60,14 +60,13 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                 : ListView.builder(
                     controller: _scroll,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 20),
+                      horizontal: 16,
+                      vertical: 20,
+                    ),
                     itemCount: messages.length,
                     itemBuilder: (context, i) {
                       final msg = messages[i];
-                      return _bubble(
-                        msg.content,
-                        msg.role == ChatRole.user,
-                      );
+                      return _bubble(msg.content, msg.role == ChatRole.user);
                     },
                   ),
           ),
@@ -87,8 +86,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.auto_awesome,
-                size: 48, color: Color(0xFF7C9BFF)),
+            const Icon(Icons.auto_awesome, size: 48, color: Color(0xFF7C9BFF)),
             const SizedBox(height: 20),
 
             Text(
@@ -153,7 +151,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       "Contract review",
       "Property dispute",
       "Divorce process",
-      "Startup legal"
+      "Startup legal",
     ];
 
     return Wrap(
@@ -165,14 +163,12 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             _send();
           },
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0xFF1E1F24),
               borderRadius: BorderRadius.circular(20),
             ),
-            child:
-                Text(e, style: const TextStyle(color: Colors.white70)),
+            child: Text(e, style: const TextStyle(color: Colors.white70)),
           ),
         );
       }).toList(),
@@ -188,15 +184,10 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         padding: const EdgeInsets.all(14),
         constraints: const BoxConstraints(maxWidth: 420),
         decoration: BoxDecoration(
-          color: isUser
-              ? const Color(0xFF5B7FFF)
-              : const Color(0xFF1E1F24),
+          color: isUser ? const Color(0xFF5B7FFF) : const Color(0xFF1E1F24),
           borderRadius: BorderRadius.circular(24),
         ),
-        child: Text(
-          text,
-          style: GoogleFonts.sora(color: Colors.white),
-        ),
+        child: Text(text, style: GoogleFonts.sora(color: Colors.white)),
       ),
     );
   }
@@ -230,7 +221,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             IconButton(
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed: _send,
-            )
+            ),
           ],
         ),
       ),
