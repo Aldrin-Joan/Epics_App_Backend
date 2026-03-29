@@ -4,7 +4,6 @@ import 'package:flutter_application_1/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_application_1/models/feed_post.dart';
 import 'package:flutter_application_1/providers/feed_controller.dart';
-import 'package:flutter_application_1/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// ================= PROFILE =================
