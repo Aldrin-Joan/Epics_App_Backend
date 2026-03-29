@@ -11,7 +11,7 @@ QUESTIONS = [
     {"lang": "bn", "text": "মৌলিক অধিকার গুলো কি কি?", "desc": "Bengali (Fundamental Rights)"}
 ]
 
-url = "http://127.0.0.1:8000/legal/voice-query"
+url = "http://127.0.0.1:8001/legal/voice-query"
 
 for idx, q in enumerate(QUESTIONS):
     print(f"\n--- TEST {idx+1}: {q['desc']} ---")

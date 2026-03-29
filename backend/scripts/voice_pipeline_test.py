@@ -13,7 +13,7 @@ import time
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8001"
 VOICE_URL = f"{BASE_URL}/legal/voice-query"
 
 # Test cases: multiple languages
@@ -102,7 +102,7 @@ def run_test(idx, q):
             print(f"  ERROR {resp.status_code}: {resp.text[:500]}")
 
     except requests.exceptions.ConnectionError:
-        print("  CONNECTION ERROR — Is the backend running on port 8000?")
+        print("  CONNECTION ERROR — Is the backend running on port 8001?")
     except Exception as e:
         print(f"  REQUEST FAILED: {e}")
     finally:
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         print(f"Backend reachable: YES (HTTP {hc.status_code})")
     except Exception:
         print("Backend NOT reachable — please start it with:")
-        print("  venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8000")
+        print("  venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8001")
         sys.exit(1)
 
     for i, q in enumerate(QUESTIONS):
